@@ -1,0 +1,7 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement style="flex-grow: 1;">
+        <ui:Label text="ss" style="-unity-font-style: bold; -unity-text-align: lower-left;" />
+        <ui:TextField label="ss" placeholder-text="filler text" name="url" style="-unity-font-style: bold;" />
+        <ui:EnumField label="Enum" value="HAHA" type="TestEnum, XAsset" />
+    </ui:VisualElement>
+</ui:UXML>

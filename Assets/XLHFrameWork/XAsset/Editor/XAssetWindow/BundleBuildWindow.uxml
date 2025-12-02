@@ -1,0 +1,7 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/XLHFrameWork/XAsset/Editor/XAssetWindow/BundleBuildWindow.uss?fileID=7433441132597879392&amp;guid=2207e9088b851364687fb45cad82e513&amp;type=3#BundleBuildWindow" />
+    <ui:VisualElement name="Root" style="flex-grow: 1; flex-direction: row;">
+        <ui:ListView name="MenuView" virtualization-method="FixedHeight" show-border="false" fixed-item-height="40" style="flex-grow: 0; width: 20%; padding-top: 2px; padding-right: 2px; padding-bottom: 2px; padding-left: 2px; border-left-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; height: auto; flex-basis: auto;" />
+    </ui:VisualElement>
+    <ui:Label text="Label" name="DetailLabel" style="display: none;" />
+</ui:UXML>

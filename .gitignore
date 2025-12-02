@@ -1,0 +1,47 @@
+# ================================
+# Unity generated
+# ================================
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Mm]emoryCaptures/
+
+# Cache for GI (Global Illumination)
+Library/GI/
+
+# Auto-generated VS/VSCode/JetBrains files
+.vs/
+.vscode/
+.idea/
+*.csproj
+*.unityproj
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+
+# ================================
+# OS generated
+# ================================
+.DS_Store
+Thumbs.db
+
+# ================================
+# Build results
+# ================================
+*.apk
+*.aab
+*.unitypackage
+
+# ================================
+# Others
+# ================================
+# Crashlytics generated files
+crashlytics-build.properties

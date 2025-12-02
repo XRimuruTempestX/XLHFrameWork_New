@@ -9,7 +9,7 @@ onBoardingDoNotAskAgain = true
 showPackageIndexes = false
 showStatusBar = false
 scopes = {
-	"picker_window_position_offset.075BCD15" = "883;285;718;550"
+	"picker_window_position_offset.075BCD15" = "883.3333;285.3333;718;550"
 	"picker_visibility_flags.075BCD15" = "264"
 	"picker_item_size.075BCD15" = "96"
 	"picker_inspector.075BCD15" = "0"
@@ -69,9 +69,14 @@ providers = {
 objectSelectors = {
 }
 recentSearches = [
+	"type: BuildTarget"
+	"type: BuildAssetBundleOptions"
+	"type: loadasset"
+	"type: bundleho"
 	"type: TestEnum"
 ]
 searchItemFavorites = [
+	"XLHFrameWork.XAsset.Config.BundleHotEnum, XAsset, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
 ]
 savedSearchesSortOrder = 0
 showSavedSearchPanel = false

@@ -1,0 +1,11 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/XLHFrameWork/XAsset/Editor/XAssetWindow/BundleModuleConfig.uss?fileID=7433441132597879392&amp;guid=e510da92a4b6ece41a9ebfd2b22bcc58&amp;type=3#BundleModuleConfig" />
+    <ui:TextField label="资源模块名称" placeholder-text="filler text" style="border-top-width: 2px;" />
+    <ui:Toggle label="是否可寻址资源" style="border-top-width: 2px;" />
+    <uie:Toolbar>
+        <ui:Button text="Button" style="width: 186px;" />
+        <ui:Button text="Button" style="width: 186px; flex-grow: 0;" />
+        <ui:Button text="Button" style="width: 186px; flex-grow: 1;" />
+    </uie:Toolbar>
+    <ui:VisualElement style="flex-grow: 1;" />
+</ui:UXML>

@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using XLHFrameWork.XAsset.Config;
 using XLHFrameWork.XAsset.Editor.BundleBuild;
+using BuildAssetBundleOptions = XLHFrameWork.XAsset.Config.BuildAssetBundleOptions;
+using BuildTarget = XLHFrameWork.XAsset.Config.BuildTarget;
 
 public class BundleBuildWindow : EditorWindow
 {
@@ -54,6 +56,7 @@ public class BundleBuildWindow : EditorWindow
             AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
                 "Assets/XLHFrameWork/XAsset/Editor/XAssetWindow/BundleSetting.uxml");
         VisualElement bundleSettingVE = BundleSetting.Instantiate();
+        bundleSettingVE.style.flexGrow = 1;
         // 获取控件
         listView = root.Q<ListView>("MenuView");
         detailLabel = root.Q<Label>("DetailLabel");
@@ -65,7 +68,7 @@ public class BundleBuildWindow : EditorWindow
         leftBtn =  rVE.Q<Button>("leftBtn");
         rightBtn = rVE.Q<Button>("rightBtn");
 
-        menuList = new List<string>() { "Apple", "Banana", "Cherry" };
+        menuList = new List<string>() { "AssetBundle", "HotPatch", "BundleSetting" };
 
         // 设置 ListView 数据
         listView.itemsSource = menuList;
@@ -127,6 +130,8 @@ public class BundleBuildWindow : EditorWindow
                     if(_Root.Contains(rVE))
                         _Root.Remove(rVE);
                     _Root.Add(bundleSettingVE);
+
+                    BundleSettingWindow(bundleSettingVE);
                 }
             });
         };
@@ -222,10 +227,102 @@ public class BundleBuildWindow : EditorWindow
         container.Add(item2);
     }
 
+    #region BundleSettingWindow
+
+    private TextField assetDownLoadUrl;
+    private EnumField bundleHotType;
+    private EnumField loadAssetType;
+    private IntegerField MAX_THREAD_COUNT;
+    private Toggle isEncrypt;
+    private TextField encryptKey;
+    private TextField ABSUFFIX;
+    private EnumField buildbundleOptions;
+    private EnumField buildTarget;
+    private TextField XAssetRootPath;
+    
     private void BundleSettingWindow(VisualElement root)
     {
+        assetDownLoadUrl = root.Q<TextField>("AssetBundleDownLoadUrl");
+        bundleHotType = root.Q<EnumField>("bundleHotType");
+        loadAssetType = root.Q<EnumField>("loadAssetType");
+        MAX_THREAD_COUNT = root.Q<IntegerField>("MAX_THREAD_COUNT");
+        isEncrypt = root.Q<Toggle>("isEncrypt");
+        encryptKey = root.Q<TextField>("encryptKey");
+        ABSUFFIX = root.Q<TextField>("ABSUFFIX");
+        buildbundleOptions = root.Q<EnumField>("buildbundleOptions");
+        buildTarget = root.Q<EnumField>("buildTarget");
+        XAssetRootPath = root.Q<TextField>("XAssetRootPath");
+
+        SetInitialValues();
         
+        assetDownLoadUrl.RegisterValueChangedCallback(evt => SaveSetting("AssetBundleDownLoadUrl", evt.newValue));
+        bundleHotType.RegisterValueChangedCallback(evt => SaveSetting("bundleHotType", evt.newValue));
+        loadAssetType.RegisterValueChangedCallback(evt => SaveSetting("loadAssetType", evt.newValue));
+        MAX_THREAD_COUNT.RegisterValueChangedCallback(evt => SaveSetting("MAX_THREAD_COUNT", evt.newValue));
+        isEncrypt.RegisterValueChangedCallback(evt => SaveSetting("isEncrypt", evt.newValue));
+        encryptKey.RegisterValueChangedCallback(evt => SaveSetting("encryptKey", evt.newValue));
+        ABSUFFIX.RegisterValueChangedCallback(evt => SaveSetting("ABSUFFIX", evt.newValue));
+        buildbundleOptions.RegisterValueChangedCallback(evt => SaveSetting("buildbundleOptions", evt.newValue));
+        buildTarget.RegisterValueChangedCallback(evt => SaveSetting("buildTarget", evt.newValue));
+        XAssetRootPath.RegisterValueChangedCallback(evt => SaveSetting("XAssetRootPath", evt.newValue));
     }
+    
+    private void SetInitialValues()
+    {
+        assetDownLoadUrl.value = BundleSettings.Instance.AssetBundleDownLoadUrl;
+        bundleHotType.value = BundleSettings.Instance.bundleHotType;
+        loadAssetType.value = BundleSettings.Instance.loadAssetType;
+        MAX_THREAD_COUNT.value = BundleSettings.Instance.MAX_THREAD_COUNT;
+        isEncrypt.value = BundleSettings.Instance.bundleEncrypt.isEncrypt;
+        encryptKey.value = BundleSettings.Instance.bundleEncrypt.encryptKey;
+        ABSUFFIX.value = BundleSettings.Instance.ABSUFFIX;
+        buildbundleOptions.value = BundleSettings.Instance.buildbundleOptions;
+        buildTarget.value = BundleSettings.Instance.buildTarget;
+        XAssetRootPath.value = BundleSettings.Instance.XAssetRootPath;
+    }
+
+    // 保存设置的方法
+    private void SaveSetting(string key, object value)
+    {
+        // 根据 key 保存对应的值
+        switch (key)
+        {
+            case "AssetBundleDownLoadUrl":
+                BundleSettings.Instance.AssetBundleDownLoadUrl = (string)value;
+                break;
+            case "bundleHotType":
+                BundleSettings.Instance.bundleHotType = (BundleHotEnum)value;
+                break;
+            case "loadAssetType":
+                BundleSettings.Instance.loadAssetType = (LoadAssetEnum)value;
+                break;
+            case "MAX_THREAD_COUNT":
+                BundleSettings.Instance.MAX_THREAD_COUNT = (int)value;
+                break;
+            case "isEncrypt":
+                BundleSettings.Instance.bundleEncrypt.isEncrypt = (bool)value;
+                break;
+            case "encryptKey":
+                BundleSettings.Instance.bundleEncrypt.encryptKey = (string)value;
+                break;
+            case "ABSUFFIX":
+                BundleSettings.Instance.ABSUFFIX = (string)value;
+                break;
+            case "buildbundleOptions":
+                BundleSettings.Instance.buildbundleOptions = (BuildAssetBundleOptions)value;
+                break;
+            case "buildTarget":
+                BundleSettings.Instance.buildTarget = (BuildTarget)value;
+                break;
+            case "XAssetRootPath":
+                BundleSettings.Instance.XAssetRootPath = (string)value;
+                break;
+        }
+    }
+
+    #endregion
+    
+
     
     private void OnDestroy()
     {

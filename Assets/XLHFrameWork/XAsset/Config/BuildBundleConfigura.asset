@@ -18,8 +18,8 @@ MonoBehaviour:
     isAddressableAsset: 0
     isBuild: 0
     isAddModule: 0
-    lastClickBtnTime: 0
+    lastClickBtnTime: 87644.26
     prefabPathArr:
-    - Assets/XLHFrameWork/XAsset/Config
+    - Assets/Test
     rootFolderPathArr: []
     singleFolderPathArr: []

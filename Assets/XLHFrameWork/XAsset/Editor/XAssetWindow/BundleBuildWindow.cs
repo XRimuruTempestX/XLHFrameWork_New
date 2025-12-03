@@ -70,6 +70,18 @@ public class BundleBuildWindow : EditorWindow
 
         menuList = new List<string>() { "AssetBundle", "HotPatch", "BundleSetting" };
 
+
+        leftBtn.clicked += () =>
+        {
+            for (int i = 0; i < BuildBundleConfigura.Instance.AssetBundleConfig.Count; i++)
+            {
+                if (BuildBundleConfigura.Instance.AssetBundleConfig[i].isBuild)
+                {
+                    BuildBundleCompiler.BuildAssetBundle(BuildBundleConfigura.Instance.AssetBundleConfig[i], BuildType.AssetBundle);
+                }
+            }
+        };
+        
         // 设置 ListView 数据
         listView.itemsSource = menuList;
         listView.selectionType = SelectionType.Single;

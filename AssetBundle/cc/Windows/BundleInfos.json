@@ -1,0 +1,42 @@
+{
+  "d110a51d658a07fea109a7f98171fadc": {
+    "FileName": "D:/A_MyFrameWork_New/Assets/../AssetBundle/cc/Windows//d110a51d658a07fea109a7f98171fadc",
+    "Crc": 2201981899,
+    "Hash": {
+      "isValid": true
+    },
+    "Dependencies": []
+  },
+  "8037802750ee0db80806e049126ac0b7": {
+    "FileName": "D:/A_MyFrameWork_New/Assets/../AssetBundle/cc/Windows//8037802750ee0db80806e049126ac0b7",
+    "Crc": 3389263264,
+    "Hash": {
+      "isValid": true
+    },
+    "Dependencies": []
+  },
+  "d808ac5b908fc360a92feeee659bfa92": {
+    "FileName": "D:/A_MyFrameWork_New/Assets/../AssetBundle/cc/Windows//d808ac5b908fc360a92feeee659bfa92",
+    "Crc": 4275247363,
+    "Hash": {
+      "isValid": true
+    },
+    "Dependencies": []
+  },
+  "4194cb084d5b740c1aadcfb0064ee912": {
+    "FileName": "D:/A_MyFrameWork_New/Assets/../AssetBundle/cc/Windows//4194cb084d5b740c1aadcfb0064ee912",
+    "Crc": 847756505,
+    "Hash": {
+      "isValid": true
+    },
+    "Dependencies": []
+  },
+  "0b21e68333076d5271086823805823cc": {
+    "FileName": "D:/A_MyFrameWork_New/Assets/../AssetBundle/cc/Windows//0b21e68333076d5271086823805823cc",
+    "Crc": 2195611314,
+    "Hash": {
+      "isValid": true
+    },
+    "Dependencies": []
+  }
+}

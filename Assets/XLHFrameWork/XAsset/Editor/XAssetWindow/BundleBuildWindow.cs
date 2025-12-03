@@ -166,7 +166,7 @@ public class BundleBuildWindow : EditorWindow
         container.style.flexDirection = FlexDirection.Row;
         container.style.flexWrap = Wrap.Wrap;
 
-        if (BuildBundleConfigura.Instance.AssetBundleConfig.Count == 0)
+        /*if (BuildBundleConfigura.Instance.AssetBundleConfig.Count == 0)
         {
             var item = itemButton.Instantiate();
             var button = item.Q<Button>("menu-item");
@@ -175,10 +175,11 @@ public class BundleBuildWindow : EditorWindow
             button.clicked += () =>
             {
                 //button.AddToClassList("selected");
+                BundleModuleConfig.ShowExample();
                 Debug.Log("添加");
             };
             container.Add(item);
-        }
+        }*/
 
 
         foreach (var assetItem in BuildBundleConfigura.Instance.AssetBundleConfig)
@@ -207,6 +208,7 @@ public class BundleBuildWindow : EditorWindow
                 button.ToggleInClassList("menu-button");
                 if (Time.realtimeSinceStartup - dataItem.lastClickBtnTime < 0.2f)
                 {
+                    BundleModuleConfig.ShowExample(assetItem);
                     Debug.Log("123123");
                 }
 
@@ -222,6 +224,7 @@ public class BundleBuildWindow : EditorWindow
         button2.clicked += () =>
         {
             //button.AddToClassList("selected");
+            BundleModuleConfig.ShowExample();
             Debug.Log("添加");
         };
         container.Add(item2);
@@ -321,17 +324,19 @@ public class BundleBuildWindow : EditorWindow
     }
 
     #endregion
-    
+
+    private void OnFocus()
+    {
+        rootVisualElement.Clear();
+        CreateGUI();
+    }
 
     
     private void OnDestroy()
     {
         BuildBundleConfigura.Instance.ClearclickTime();
+        EditorUtility.SetDirty(BundleSettings.Instance);
+        AssetDatabase.SaveAssets();
     }
 }
 
-public enum TestEnum
-{
-    None,
-    HAHA
-}

@@ -14,38 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AssetBundleConfig:
   - bundleid: 0
-    moduleName: a
+    moduleName: cc
     isAddressableAsset: 0
     isBuild: 0
     isAddModule: 0
     lastClickBtnTime: 0
-    prefabPathArr: []
+    prefabPathArr:
+    - Assets/XLHFrameWork/XAsset/Config
     rootFolderPathArr: []
-    signFolderPathArr: []
-  - bundleid: 0
-    moduleName: s
-    isAddressableAsset: 0
-    isBuild: 1
-    isAddModule: 0
-    lastClickBtnTime: 0
-    prefabPathArr: []
-    rootFolderPathArr: []
-    signFolderPathArr: []
-  - bundleid: 0
-    moduleName: d
-    isAddressableAsset: 0
-    isBuild: 0
-    isAddModule: 0
-    lastClickBtnTime: 0
-    prefabPathArr: []
-    rootFolderPathArr: []
-    signFolderPathArr: []
-  - bundleid: 0
-    moduleName: f
-    isAddressableAsset: 0
-    isBuild: 0
-    isAddModule: 0
-    lastClickBtnTime: 0
-    prefabPathArr: []
-    rootFolderPathArr: []
-    signFolderPathArr: []
+    singleFolderPathArr: []

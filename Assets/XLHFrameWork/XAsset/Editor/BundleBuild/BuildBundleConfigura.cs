@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using XLHFrameWork.XAsset.Config;
@@ -101,6 +102,11 @@ namespace XLHFrameWork.XAsset.Editor.BundleBuild
             {
                 item.lastClickBtnTime = 0;
             }
+        }
+
+        public bool CheckRepeatName(string moduleName)
+        {
+            return AssetBundleConfig.Any(x => x.moduleName == moduleName);
         }
         
 #endif

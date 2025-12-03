@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using Newtonsoft.Json;
+using NUnit.Framework;
 
 namespace XLHFrameWork.XAsset.Config
 {
@@ -24,19 +26,12 @@ namespace XLHFrameWork.XAsset.Config
 
 
  
-        public string[] prefabPathArr ;
+        public List<string> prefabPathArr = new List<string>() ;
 
 
-        public string[] rootFolderPathArr;
+        public List<string> rootFolderPathArr  = new List<string>();
 
-        public BundleFileInfo[] signFolderPathArr;
+        public List<string> singleFolderPathArr  = new List<string>();
     }
-    [System.Serializable]
-    public class BundleFileInfo
-    {
-
-        public string abName="AB Name";
-
-        public string bundlePath="BundlePath...";
-    }
+   
 }

@@ -68,7 +68,15 @@ public class BundleSettings : ScriptableObject
     //AssetBundle内嵌文件路径
     private string BuiltinAssetsPath { get { return Application.streamingAssetsPath + "/AssetBundle/"; } }
     
-    
+    /// <summary>
+    /// 热更清单文件名称
+    /// </summary>
+    /// <param name="moduleEnum"></param>
+    /// <returns></returns>
+    public string HotManifestName(BundleModuleEnum moduleEnum)
+    {
+        return $"{moduleEnum}AssetsHotManifest_{GetPlatformName()}.json";
+    }
     /*/// <summary>
     /// 获取资源内嵌的路径
     /// </summary>
@@ -110,15 +118,7 @@ public class BundleSettings : ScriptableObject
     {
         return $"{moduleEnum.ToString().ToLower()}bundleconfig{ABSUFFIX}";
     }
-    /// <summary>
-    /// 热更清单文件名称
-    /// </summary>
-    /// <param name="moduleEnum"></param>
-    /// <returns></returns>
-    public string HotManifestName(BundleModuleEnum moduleEnum)
-    {
-        return $"{moduleEnum}AssetsHotManifest_{GetPlatformName()}.json";
-    }*/
+*/
 
     /// <summary>
     /// 获取当前运行平台

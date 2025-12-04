@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XAsset", "XAsset.csproj", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor", "Assembly-CSharp-Editor.csproj", "{36e1ec41-d464-6f32-1760-02a6937f73ab}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XAsset.Editor", "XAsset.Editor.csproj", "{f5e06525-5b0c-6385-0a51-233d5dcbe1d4}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{991d4d90-7d85-4d12-bef8-2131a655fe9d}"
 EndProject
 Global
@@ -16,6 +18,8 @@ Global
 		{dbcb7265-07af-a3a5-4f09-d7b2bc16c976}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36e1ec41-d464-6f32-1760-02a6937f73ab}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{36e1ec41-d464-6f32-1760-02a6937f73ab}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{f5e06525-5b0c-6385-0a51-233d5dcbe1d4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{f5e06525-5b0c-6385-0a51-233d5dcbe1d4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{991d4d90-7d85-4d12-bef8-2131a655fe9d}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{991d4d90-7d85-4d12-bef8-2131a655fe9d}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection

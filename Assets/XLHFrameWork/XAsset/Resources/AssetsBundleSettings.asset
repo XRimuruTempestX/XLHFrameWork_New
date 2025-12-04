@@ -16,7 +16,7 @@ MonoBehaviour:
   bundleEncrypt:
     isEncrypt: 0
     encryptKey: 
-  ABSUFFIX: .cc
+  ABSUFFIX: 
   buildbundleOptions: 0
   buildTarget: 19
   bundleHotType: 0

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEditor;
 using UnityEditor.Build.Pipeline;
@@ -10,7 +11,9 @@ using UnityEditor.Build.Pipeline.Tasks;
 using UnityEditor.Build.Pipeline.Utilities;
 using UnityEngine;
 using XLHFrameWork.XAsset.Config;
-using BuildTarget = XLHFrameWork.XAsset.Config.BuildTarget;
+using XLHFrameWork.XAsset.Runtime.BundleHot;
+using XLHFrameWork.XAsset.Runtime.Helper;
+using MD5 = XLHFrameWork.XAsset.Runtime.Helper.MD5;
 
 namespace XLHFrameWork.XAsset.Editor.BundleBuild
 {
@@ -101,7 +104,7 @@ namespace XLHFrameWork.XAsset.Editor.BundleBuild
         /// </summary>
         private static string mResourcesPath
         {
-            get { return Application.dataPath + "/" + BundleSettings.Instance.XAssetRootPath + "/Resources/"; }
+            get { return BundleSettings.Instance.XAssetRootPath + "/Resources/"; }
         }
 
         /// <summary>
@@ -342,35 +345,207 @@ namespace XLHFrameWork.XAsset.Editor.BundleBuild
                 //生成所有要打包的Bundle
                 GenerateBundleBuilder();
                 //生成一份AssetBundle配置
-                // WriteAssetBundleConfig();
+                 WriteAssetBundleConfig();
 
                 AssetDatabase.Refresh();
-              //  BuildAllBundles(mBundleOutPutPath, BundleSettings.Instance.buildTarget, true);
-                //调用UnityAPI打包AssetBundle
-                /*AssetBundleManifest manifest= BuildPipeline.BuildAssetBundles(mBundleOutPutPath,mBundleBuildList.ToArray(), (UnityEditor.BuildAssetBundleOptions)Enum.Parse(typeof(UnityEditor.BuildAssetBundleOptions),BundleSettings.Instance.buildbundleOptions.ToString())
-                    , (UnityEditor.BuildTarget)Enum.Parse(typeof(UnityEditor.BuildTarget), BundleSettings.Instance.buildTarget.ToString()));
-                if (manifest==null)
+
+                string json = JsonConvert.SerializeObject(mBundleBuildList, Formatting.Indented);
+                Debug.Log(json);
+                
+                IBundleBuildContent buildContent = new BundleBuildContent(mBundleBuildList);
+
+                var buildParams = new BundleBuildParameters(
+                    EditorUserBuildSettings.activeBuildTarget,BuildPipeline.GetBuildTargetGroup(EditorUserBuildSettings.activeBuildTarget),mBundleOutPutPath
+                );
+                buildParams.BundleCompression = BuildCompression.LZ4;
+
+                IBundleBuildResults results;
+                
+                var status = ContentPipeline.BuildAssetBundles(buildParams, buildContent, out results);
+
+                if (status == ReturnCode.Success)
                 {
-                    Debug.LogError("AssetBundle Build failed!");
+                    Debug.Log("打包成功");
+                    string data = JsonConvert.SerializeObject(results, Formatting.Indented);
+                    File.WriteAllText(mBundleOutPutPath + "/ccdata.json", data);
+
+                    DeleteAllBundleManifestFile();
+                    EncryptAllBundle();
+                    
+                    if (mBuildType == BuildType.HotPatch)
+                    {
+                        GeneratorHotAssets();
+                    }
                 }
                 else
                 {
-                    Debug.Log("AssetBundle Build Successs!:"+ manifest);
-                    //DeleteAllBundleManifestFile();
-                  //  EncryptAllBundle();
-                    if (mBuildType== BuildType.HotPatch)
-                    {
-                   //     GeneratorHotAssets();
-                        EditorUtility.RevealInFinder(mHotAssetsOutPutPath);
-                    }
-                }*/
+                    Debug.LogError("打包失败");
+                }
+
             }
             finally
             {
                 //   EditorUtility.ClearProgressBar();
             }
         }
+        
+        /// <summary>
+        /// 生成热更资源
+        /// </summary>
+        public static void GeneratorHotAssets()
+        {
+            FileHelper.DeleteFolder(mHotAssetsOutPutPath);
+            Directory.CreateDirectory(mHotAssetsOutPutPath);
 
+            string[] bundlePatchArr= Directory.GetFiles(mBundleOutPutPath,"*"+ BundleSettings.Instance.ABSUFFIX);
+            for (int i = 0; i < bundlePatchArr.Length; i++)
+            {
+                string path = bundlePatchArr[i];
+                string disPath = mHotAssetsOutPutPath + Path.GetFileName(path);
+                File.Copy(path,disPath);
+            }
+            Debug.Log("热更文件生成成功");
+            GeneratorHotAssetsManifest();
+        }
+        /// <summary>
+        /// 生成热更资源配置清单
+        /// </summary>
+        public static void GeneratorHotAssetsManifest()
+        {
+            //设置清单数据
+            HotAssetsManifest assetsManifest = new HotAssetsManifest();
+            assetsManifest.appVersion = mHotAppVersion;
+            assetsManifest.updateNotice = mUpdateNotice;
+            assetsManifest.downLoadURL = BundleSettings.Instance.AssetBundleDownLoadUrl+"/HotAssets/"+mBundleModuleEnum+"/"+ 
+                                         mHotAppVersion +"/"+ mHotPatchVersion+"/"+BundleSettings.Instance.GetPlatformName();
+
+            //设置补丁数据
+            HotAssetsPatch hotAssetsPatch = new HotAssetsPatch();
+            hotAssetsPatch.patchVersion = mHotPatchVersion;
+            //计算热更补丁文件信息
+            DirectoryInfo directory = new DirectoryInfo(mHotAssetsOutPutPath);
+            FileInfo[] bundleInfoArr= directory.GetFiles("*"+ BundleSettings.Instance.ABSUFFIX);
+            foreach (var bundleInfo in bundleInfoArr)
+            {
+                HotFileInfo info = new HotFileInfo();
+                info.abName = bundleInfo.Name;
+                info.md5 = MD5.GetMd5FromFile(bundleInfo.FullName);
+                info.size = bundleInfo.Length / 1024.0f;
+                hotAssetsPatch.hotAssetsList.Add(info);
+            }
+            assetsManifest.hotAssetsPatchList.Add(hotAssetsPatch);
+
+            //把对象转换为Json字符串
+            string json= JsonConvert.SerializeObject(assetsManifest, Formatting.Indented);
+            string hotMainifestPath = Application.dataPath + "/../HotAssets/" + mBundleModuleEnum +"/"+ BundleSettings.Instance.HotManifestName(mBundleModuleEnum);
+            //生成热更清单，用来对比MD5和文件下载
+            FileHelper.WriteFile(hotMainifestPath, System.Text.Encoding.UTF8.GetBytes(json));
+            //备份热更清单，用来版本回退
+            File.Copy(hotMainifestPath,mHotAssetsOutPutPath+BundleSettings.Instance.HotManifestName(mBundleModuleEnum));
+        }
+
+
+        /// <summary>
+        /// 生成AssetBundle配置文件
+        /// </summary>
+        public static void WriteAssetBundleConfig()
+        {
+            BundleConfig config = new BundleConfig();
+            config.bundleInfoList = new List<BundleInfo>();
+            
+            //所有AssetBundle文件字典 key =路径 value =AssetBundleName
+            Dictionary<string, string> allBundleFilePathDic = new Dictionary<string, string>();
+            //遍历所有的Bundle列表，收集成字典，方便写入配置
+            foreach (var item in mBundleBuildList)
+            {
+                foreach (var itemValue in item.assetNames)
+                {
+                    if (!allBundleFilePathDic.ContainsKey(itemValue))
+                    {
+                        allBundleFilePathDic.Add(itemValue, item.assetBundleName);
+                    }
+                }
+            }
+            
+            //计算AssetBundle数据，生成AsestBundle配置文件。
+            foreach (var item in allBundleFilePathDic)
+            {
+                //获取文件路径
+                string filePath = item.Key;
+                if (!filePath.EndsWith(".cs"))
+                {
+                    BundleInfo info = new BundleInfo();
+                    info.path = filePath;
+                    info.bundleName = item.Value;
+                    info.assetName = Path.GetFileName(filePath);
+                    info.crc = Crc32.GetCrc32(filePath);
+                    info.bundleModule = mBundleModuleEnum.ToString();
+                    info.isAddressableAsset = mBuildModuleData.isAddressableAsset;
+                    info.bundleDependce = new List<string>();
+                    string[] dependence= AssetDatabase.GetDependencies(filePath);
+                    foreach (var dePath in dependence)
+                    {
+                        //如果依赖项不是当前的这个文件，以及依赖项不是cs脚本 就进行处理
+                        if (!dePath.Equals(filePath) && dePath.EndsWith(".cs")==false)
+                        {
+                            if (allBundleFilePathDic.TryGetValue(dePath,out var assetBundleName))
+                            {
+                                //如果依赖项已经包含这个AssetBundle就不进行处理，否则添加进依赖项
+                                if (!info.bundleDependce.Contains(assetBundleName))
+                                {
+                                    info.bundleDependce.Add(assetBundleName);
+                                }
+                            }
+                        }
+                    }
+
+                    config.bundleInfoList.Add(info);
+                }
+            }
+            //生成AsestBundle配置文件
+            string json = JsonConvert.SerializeObject(config,Formatting.Indented);
+            string bundleConfigPath = BundleSettings.Instance.XAssetRootPath + "/Config/" + mBundleModuleEnum.ToString().ToLower() + "assetbundleconfig.json";
+            StreamWriter writer= File.CreateText(bundleConfigPath);
+            writer.Write(json);
+            writer.Dispose();
+            writer.Close();
+
+            AssetDatabase.Refresh();
+            
+            //生成热更模块配置到Resources文件夹
+            GeneratorHotModuleCfgToResource();
+        }
+        
+        /// <summary>
+        /// 生成热更模块配置到Resources文件夹
+        /// </summary>
+        public static void GeneratorHotModuleCfgToResource()
+        {
+            string bundleModuleCfgJson = string.Empty;
+            TextAsset textAsset= Resources.Load<TextAsset>("bundlemoduleCfg");
+            if (textAsset==null)
+            {
+                List<BundleModuleData> bundleModuleData = new List<BundleModuleData> { mBuildModuleData };
+                bundleModuleCfgJson = JsonConvert.SerializeObject(bundleModuleData);
+                File.WriteAllText(mResourcesPath + "bundlemoduleCfg.json", bundleModuleCfgJson);
+            }
+            else
+            {
+                List<BundleModuleData> bundleModuleData = JsonConvert.DeserializeObject<List<BundleModuleData>>(textAsset.text);
+                for (int i = 0; i < bundleModuleData.Count; i++)
+                {
+                    if (string.Equals(bundleModuleData[i].moduleName,mBuildModuleData.moduleName))
+                    {
+                        bundleModuleData.Remove(bundleModuleData[i]);
+                        break;
+                    }
+                }
+                bundleModuleData.Add(mBuildModuleData);
+                bundleModuleCfgJson= JsonConvert.SerializeObject(bundleModuleData);
+                File.WriteAllText(mResourcesPath+ "bundlemoduleCfg.json", bundleModuleCfgJson);
+            }
+
+        }
 
         /// <summary>
         /// 生成Bundle打包列表
@@ -399,16 +574,113 @@ namespace XLHFrameWork.XAsset.Editor.BundleBuild
             }
 
             //收集至Bundle打包配置文件
-            /*string bundleConfigPath = Application.dataPath + "/" + BundleSettings.Instance.XAssetRootPath + "/Config/" + mBundleModuleEnum.ToString().ToLower() + "assetbundleconfig.json";
+            string bundleConfigPath = BundleSettings.Instance.XAssetRootPath + "/Config/" + mBundleModuleEnum.ToString().ToLower() + "assetbundleconfig.json";
             mBundleBuildList.Add(new AssetBundleBuild(){ assetBundleName = mBundleModuleEnum.ToString().ToLower() + "bundleconfig"+BundleSettings.Instance.ABSUFFIX,assetNames = new []
             {
                 $"{bundleConfigPath.Replace(Application.dataPath, "Assets/")}"
-            }});*/
+            }});
+        }
+        
+        /// <summary>
+        /// 删除所有AssetBundle自动生成的清单文件
+        /// </summary>
+        private static void DeleteAllBundleManifestFile()
+        {
+            string[] filePathArr= Directory.GetFiles(mBundleOutPutPath);
+            foreach (var path in filePathArr)
+            {
+                if (path.EndsWith(".manifest"))
+                {
+                    File.Delete(path);
+                }
+            }
+        }
+        
+        /// <summary>
+        /// 加密所有的AssetBundle
+        /// </summary>
+        private static void EncryptAllBundle()
+        {
+            if (BundleSettings.Instance.bundleEncrypt.isEncrypt)
+            {
+                DirectoryInfo directoryInfo = new DirectoryInfo(mBundleOutPutPath);
+                FileInfo[] fileInfoArr = directoryInfo.GetFiles("*", SearchOption.AllDirectories);
+                for (int i = 0; i < fileInfoArr.Length; i++)
+                {
+                    AES.AESFileEncrypt(fileInfoArr[i].FullName, BundleSettings.Instance.bundleEncrypt.encryptKey);
+                }
+                Debug.Log("AssetBundle Encrypt Finish!");
+            }
         }
 
         private static string GenerateBundleName(string abName)
         {
             return mBundleModuleEnum.ToString() + "_" + abName;
+        }
+        
+        /// <summary>
+        /// 拷贝AssetBundle至StramingAssets文件夹
+        /// </summary>
+        /// <param name="moduleData"></param>
+        /// <param name="showTips"></param>
+        public static void CopyBundleToStramingAssets(BundleModuleData moduleData,bool showTips=true)
+        {
+            mBundleModuleEnum = (BundleModuleEnum)Enum.Parse(typeof(BundleModuleEnum),moduleData.moduleName);
+            //获取目标文件夹下的所有AssetBundle文件
+            DirectoryInfo directoryInfo = new DirectoryInfo(mBundleOutPutPath);
+            FileInfo[] fileInfoArr = directoryInfo.GetFiles("*", SearchOption.AllDirectories);
+            //Bundle内嵌的目标文件夹
+            string streamingAssetsPath = Application.streamingAssetsPath + "/AssetBundle/" + mBundleModuleEnum + "/";
+
+            FileHelper.DeleteFolder(streamingAssetsPath);
+            Directory.CreateDirectory(streamingAssetsPath);
+
+            List<BuiltinBundleInfo> bundleInfoList = new List<BuiltinBundleInfo>();
+            for (int i = 0; i < fileInfoArr.Length; i++)
+            {
+                //拷贝文件
+                File.Copy(fileInfoArr[i].FullName, streamingAssetsPath+ fileInfoArr[i].Name);
+                //生成内嵌资源文件信息
+                BuiltinBundleInfo info = new BuiltinBundleInfo();
+                info.fileName = fileInfoArr[i].Name;
+                info.md5 = MD5.GetMd5FromFile(fileInfoArr[i].FullName);
+                info.size = fileInfoArr[i].Length / 1024;
+                bundleInfoList.Add(info);
+            }
+
+            string json = JsonConvert.SerializeObject(bundleInfoList, Formatting.Indented);
+
+            if (!Directory.Exists(mResourcesPath))
+            {
+                Directory.CreateDirectory(mResourcesPath);
+            }
+
+            //写入包内资源配置文件到Resources文件夹
+            FileHelper.WriteFile(mResourcesPath+mBundleModuleEnum+"info.json",System.Text.Encoding.UTF8.GetBytes(json));
+
+            AssetDatabase.Refresh();
+
+            if (showTips)
+            {
+                EditorUtility.DisplayDialog("内嵌操作","内嵌资源完成 Path："+ streamingAssetsPath,"确认");
+            }
+            Debug.Log(" Assets Copy toStreamingAssets Finish!");
+        }
+        
+        [MenuItem("XLHFrameWork/XAsset/BundleFolder")]
+        public static void OpenAssetBundleFolder()
+        {
+            EditorUtility.RevealInFinder(Application.dataPath + "/../AssetBundle/");
+        }
+        [MenuItem("XLHFrameWork/XAsset/HotBundleFolder")]
+        public static void OpenHotBundleFolder()
+        { 
+            EditorUtility.RevealInFinder(Application.dataPath + "/../HotAssets/");
+        }
+        [MenuItem("XLHFrameWork/XAsset/PersistentFolder")]
+        public static void OpenPersistentFolder()
+        { 
+            EditorUtility.RevealInFinder(Application.persistentDataPath+"/");
         }
     }
 }

@@ -1,0 +1,75 @@
+{
+  "bundleInfoList": [
+    {
+      "path": "Assets/Test/Cube (1).prefab",
+      "crc": 426013251,
+      "bundleName": "cc_cube (1)",
+      "assetName": "Cube (1).prefab",
+      "bundleModule": "cc",
+      "isAddressableAsset": false,
+      "bundleDependce": [
+        "cc_cube (1)"
+      ]
+    },
+    {
+      "path": "Packages/com.unity.render-pipelines.universal/Runtime/Materials/Lit.mat",
+      "crc": 3890929876,
+      "bundleName": "cc_cube (1)",
+      "assetName": "Lit.mat",
+      "bundleModule": "cc",
+      "isAddressableAsset": false,
+      "bundleDependce": [
+        "cc_cube (1)"
+      ]
+    },
+    {
+      "path": "Packages/com.unity.render-pipelines.universal/Shaders/Lit.shader",
+      "crc": 1998644368,
+      "bundleName": "cc_cube (1)",
+      "assetName": "Lit.shader",
+      "bundleModule": "cc",
+      "isAddressableAsset": false,
+      "bundleDependce": []
+    },
+    {
+      "path": "Assets/Test/Cube.prefab",
+      "crc": 3847890575,
+      "bundleName": "cc_cube",
+      "assetName": "Cube.prefab",
+      "bundleModule": "cc",
+      "isAddressableAsset": false,
+      "bundleDependce": [
+        "cc_cube (1)"
+      ]
+    },
+    {
+      "path": "Assets/icon_bg2.png",
+      "crc": 856774532,
+      "bundleName": "cc_image",
+      "assetName": "icon_bg2.png",
+      "bundleModule": "cc",
+      "isAddressableAsset": false,
+      "bundleDependce": []
+    },
+    {
+      "path": "Assets/Test/Image.prefab",
+      "crc": 2472360292,
+      "bundleName": "cc_image",
+      "assetName": "Image.prefab",
+      "bundleModule": "cc",
+      "isAddressableAsset": false,
+      "bundleDependce": [
+        "cc_image"
+      ]
+    },
+    {
+      "path": "Assets/XLHFrameWork/XAsset/Config/ccassetbundleconfig.json",
+      "crc": 4176597759,
+      "bundleName": "ccbundleconfig",
+      "assetName": "ccassetbundleconfig.json",
+      "bundleModule": "cc",
+      "isAddressableAsset": false,
+      "bundleDependce": []
+    }
+  ]
+}

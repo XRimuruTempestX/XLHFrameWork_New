@@ -77,7 +77,8 @@ public class BundleSettings : ScriptableObject
     {
         return $"{moduleEnum}AssetsHotManifest_{GetPlatformName()}.json";
     }
-    /*/// <summary>
+    
+    /// <summary>
     /// 获取资源内嵌的路径
     /// </summary>
     /// <param name="moduleEnum"></param>
@@ -86,6 +87,7 @@ public class BundleSettings : ScriptableObject
     {
         return BuiltinAssetsPath + moduleEnum + "/";
     }
+    
     /// <summary>
     /// 获取解压文件路径(Unity2019 支持直接都streamingAssetsPath目录下Bundle)
     /// </summary>
@@ -100,6 +102,8 @@ public class BundleSettings : ScriptableObject
 #endif
         
     }
+    /*
+    
     /// <summary>
     /// 获取热更文件储存路径
     /// </summary>

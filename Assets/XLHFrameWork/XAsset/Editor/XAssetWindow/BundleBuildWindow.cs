@@ -73,11 +73,26 @@ public class BundleBuildWindow : EditorWindow
 
         leftBtn.clicked += () =>
         {
-            for (int i = 0; i < BuildBundleConfigura.Instance.AssetBundleConfig.Count; i++)
+            if (listView.selectedIndex == 0)
             {
-                if (BuildBundleConfigura.Instance.AssetBundleConfig[i].isBuild)
+                for (int i = 0; i < BuildBundleConfigura.Instance.AssetBundleConfig.Count; i++)
                 {
-                    BuildBundleCompiler.BuildAssetBundle(BuildBundleConfigura.Instance.AssetBundleConfig[i], BuildType.AssetBundle);
+                    if (BuildBundleConfigura.Instance.AssetBundleConfig[i].isBuild)
+                    {
+                        BuildBundleCompiler.BuildAssetBundle(BuildBundleConfigura.Instance.AssetBundleConfig[i], BuildType.AssetBundle);
+                    }
+                }
+            }
+
+            if (listView.selectedIndex == 1)
+            {
+                for (int i = 0; i < BuildBundleConfigura.Instance.AssetBundleConfig.Count; i++)
+                {
+                    var data = BuildBundleConfigura.Instance.AssetBundleConfig[i];
+                    if (BuildBundleConfigura.Instance.AssetBundleConfig[i].isBuild)
+                    {
+                        BuildBundleCompiler.BuildAssetBundle(data, BuildType.HotPatch,Convert.ToInt32(hotPatchVersion.value),appVersion.value,notice.value);
+                    }
                 }
             }
         };

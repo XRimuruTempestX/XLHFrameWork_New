@@ -1,0 +1,42 @@
+{
+  "updateNotice": "测试",
+  "appVersion": "0.0.1",
+  "downLoadURL": "127.0.0.1/HotAssets/cc/0.0.1/1/Windows",
+  "hotAssetsPatchList": [
+    {
+      "patchVersion": 1,
+      "hotAssetsList": [
+        {
+          "abName": "buildlogtep.json",
+          "md5": "575D75EE53E30918E66FA6667261871E",
+          "size": 12.6425781
+        },
+        {
+          "abName": "ccbundleconfig",
+          "md5": "22C2C17673542B60760D6284CD43C3DF",
+          "size": 1.62597656
+        },
+        {
+          "abName": "ccdata.json",
+          "md5": "B4D05F1A1046CF3E838B2C99E10C6ABE",
+          "size": 683.680664
+        },
+        {
+          "abName": "cc_cube",
+          "md5": "0B0DEBFF9FAC9C6A0FBE7B01ED4B371D",
+          "size": 3.16210938
+        },
+        {
+          "abName": "cc_cube (1)",
+          "md5": "9A13680A17486C50ABB0241304B8FC94",
+          "size": 55.8964844
+        },
+        {
+          "abName": "cc_image",
+          "md5": "0B2DE0C51EAA8314EBB344676D54F17D",
+          "size": 35.1943359
+        }
+      ]
+    }
+  ]
+}

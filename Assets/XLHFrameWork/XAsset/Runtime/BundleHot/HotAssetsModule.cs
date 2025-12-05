@@ -92,7 +92,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleHot
 
         private Action<HotFileInfo> onDownLoadSuccess;
         private Action<HotFileInfo> onDownLoadFailed;
-        private Action<HotAssetsModule> onDownLoadFinish;
+        public Action<HotAssetsModule> onDownLoadFinish;
 
         private CancellationTokenSource mCancellationTokenSource;
 
@@ -114,7 +114,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleHot
         /// 开始下载热更资源
         /// </summary>
         /// <param name="startDonwLoadCallBack"></param>
-        public void StartDownLoadHotAssets(Action startDonwLoadCallBack)
+        public void StartDownLoadHotAssets(Action<BundleModuleEnum> startDonwLoadCallBack)
         {
             //优先下载AssetBUndle配置文件，下载完成后呢，调用回调，让开发者及时加载配置文件
             //热更资源下载完成之后同样给与回调，供开发者动态加载刚下载完成的资源
@@ -142,7 +142,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleHot
             mAssetsDownLoader = new AssetsDownLoader(this,downLoadQueue,mServerHotAssetsManifest.downLoadURL,HotAssetsSavePath,OnDownLoadSuccess
                 ,OnDownLoadFailed,OnDownLoadAllFinish,mCancellationTokenSource.Token);
 
-            startDonwLoadCallBack?.Invoke();
+            startDonwLoadCallBack?.Invoke(CurBundleModuleEnum);
             //开始下载队列中的资源
             mAssetsDownLoader.StartDownLoadQueue();
 
@@ -191,7 +191,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleHot
         /// </summary>
         /// <param name="serverAssetsPath"></param>
         /// <returns></returns>
-        public bool ComputeNeedHotAssetsList(HotAssetsPatch serverAssetsPath)
+        private bool ComputeNeedHotAssetsList(HotAssetsPatch serverAssetsPath)
         {
             if (!Directory.Exists(HotAssetsSavePath))
             {
@@ -226,7 +226,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleHot
         /// 检测是否需要热更
         /// </summary>
         /// <returns></returns>
-        public bool CheckModuleAssetsIsHot()
+        private bool CheckModuleAssetsIsHot()
         {
             if (mServerHotAssetsManifest == null) return false;
 
@@ -330,6 +330,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleHot
                 File.WriteAllText(mLocalHotAssetManifestPath,json);
             }
             onDownLoadFinish?.Invoke(hotAssetsModule);
+            Debug.Log($"{hotAssetsModule.CurBundleModuleEnum} 下载完成------------>>>>>>>>>");
         }
 
         /// <summary>
@@ -340,6 +341,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleHot
         {
             onDownLoadFailed?.Invoke(hotFileInfo);
             allSuccessDownLoad = false;
+            Debug.LogError($"{hotFileInfo.abName} 下载失败------------>>>>>>>>>");
         }
 
         /// <summary>
@@ -349,10 +351,23 @@ namespace XLHFrameWork.XAsset.Runtime.BundleHot
         private void OnDownLoadSuccess(HotFileInfo hotFileInfo)
         {
             onDownLoadSuccess?.Invoke(hotFileInfo);
+            Debug.Log($"{hotFileInfo.abName} 下载成功------------>>>>>>>>>");
         }
 
         #endregion
-        
-        
+
+
+        /// <summary>
+        /// 设置下载线程个数
+        /// </summary>
+        /// <param name="threadCount"></param>
+        public void SetDownLoadThreadCount(int threadCount)
+        {
+            Debug.Log("多线程负载均衡:"+threadCount+" ModuleType:"+CurBundleModuleEnum);
+            if (mAssetsDownLoader != null)
+            {
+                mAssetsDownLoader.MAX_THREAD_COUNT =  threadCount;
+            }
+        }
     }
 }

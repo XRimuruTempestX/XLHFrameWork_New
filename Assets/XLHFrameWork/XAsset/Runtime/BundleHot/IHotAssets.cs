@@ -15,8 +15,10 @@ namespace XLHFrameWork.XAsset.Runtime.BundleHot
         /// <param name="waiteDownloadCallBack"></param>
         /// <param name="isCheckAssetsVersion"></param>
         /// <returns></returns>
-        UniTask StartHotAsset(BundleModuleEnum bundleModule, Action<BundleModuleEnum> startHotCallBack,Action<BundleModuleEnum> hotFinishCallBack,
-            Action<BundleModuleEnum> waiteDownloadCallBack,bool isCheckAssetsVersion = true);
+        UniTask StartHotAsset(BundleModuleEnum bundleModule, Action<BundleModuleEnum> startHotCallBack,
+            Action<BundleModuleEnum> waiteDownloadCallBack,Action<HotFileInfo> onDownLoadSuccess,
+            Action<HotFileInfo> onDownLoadFailed,
+            Action<HotAssetsModule> onDownLoadFinish,bool isCheckAssetsVersion = true);
         
         /// <summary>
         /// 检测版本是否需要热更  return 是否热更结果，热更大小

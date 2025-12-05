@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniTask.Editor", "UniTask.E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniTask.TextMeshPro", "UniTask.TextMeshPro.csproj", "{efde500c-bc08-77bf-2be8-6bc262eb7100}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XPoolManager", "XPoolManager.csproj", "{032898f7-392a-e127-e0d2-37d8827f7ee3}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{991d4d90-7d85-4d12-bef8-2131a655fe9d}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniTask.Addressables", "UniTask.Addressables.csproj", "{b957f7d8-d13f-1fbe-38b2-e44c85ad2624}"
@@ -40,6 +42,8 @@ Global
 		{199307e2-711b-c587-a7d7-c379371ab763}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{efde500c-bc08-77bf-2be8-6bc262eb7100}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{efde500c-bc08-77bf-2be8-6bc262eb7100}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{032898f7-392a-e127-e0d2-37d8827f7ee3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{032898f7-392a-e127-e0d2-37d8827f7ee3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{991d4d90-7d85-4d12-bef8-2131a655fe9d}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{991d4d90-7d85-4d12-bef8-2131a655fe9d}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{b957f7d8-d13f-1fbe-38b2-e44c85ad2624}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

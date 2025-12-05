@@ -102,7 +102,6 @@ public class BundleSettings : ScriptableObject
 #endif
         
     }
-    /*
     
     /// <summary>
     /// 获取热更文件储存路径
@@ -113,6 +112,10 @@ public class BundleSettings : ScriptableObject
     {
         return HotAssetsPath + moduleEnum + "/";
     }
+    
+    /*
+    
+    
     /// <summary>
     /// 获取配置文件名称
     /// </summary>

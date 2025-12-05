@@ -1,1 +1,15 @@
-[{"bundleid":0,"moduleName":"cc","isAddressableAsset":false,"isBuild":true,"isAddModule":false,"lastClickBtnTime":0.0,"prefabPathArr":["Assets/Test"],"rootFolderPathArr":[],"singleFolderPathArr":[]}]
+[
+  {
+    "bundleid": 0,
+    "moduleName": "cc",
+    "isAddressableAsset": false,
+    "isBuild": true,
+    "isAddModule": false,
+    "lastClickBtnTime": 110.4855,
+    "prefabPathArr": [
+      "Assets/Test"
+    ],
+    "rootFolderPathArr": [],
+    "singleFolderPathArr": []
+  }
+]

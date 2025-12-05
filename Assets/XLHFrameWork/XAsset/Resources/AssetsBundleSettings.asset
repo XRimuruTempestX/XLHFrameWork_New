@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4153679f4ffeb4428a7abdc11ef0b51, type: 3}
   m_Name: AssetsBundleSettings
   m_EditorClassIdentifier: 
-  AssetBundleDownLoadUrl: 127.0.0.1
+  AssetBundleDownLoadUrl: http://47.115.129.94
   bundleEncrypt:
     isEncrypt: 0
     encryptKey: 
   ABSUFFIX: 
   buildbundleOptions: 0
   buildTarget: 19
-  bundleHotType: 0
-  loadAssetType: 0
-  MAX_THREAD_COUNT: 0
+  bundleHotType: 1
+  loadAssetType: 1
+  MAX_THREAD_COUNT: 3
   XAssetRootPath: Assets/XLHFrameWork/XAsset

@@ -15,37 +15,44 @@ namespace XLHFrameWork.XAsset.Runtime.BundleHot
         /// 最大下载线程个数
         /// </summary>
         public int MAX_THREAD_COUNT = 3;
+
         /// <summary>
         /// 资源文件下载地址
         /// </summary>
         private string mAssetsDownLoadUrl;
+
         /// <summary>
         /// 热更文件储存路径
         /// </summary>
         private string mHotAssetsSavePath;
+
         /// <summary>
         /// 当前热更的资源模块
         /// </summary>
         private HotAssetsModule mCurHotAssetsModule;
+
         /// <summary>
         /// 文件下载队列
         /// </summary>
         private Queue<HotFileInfo> mDownLoadQueue;
+
         /// <summary>
         /// 文件下载成功回调
         /// </summary>
         private Action<HotFileInfo> OnDownLoadSuccess;
+
         /// <summary>
         /// 文件下载失败回调
         /// </summary>
         private Action<HotFileInfo> OnDownLoadFailed;
+
         /// <summary>
         /// 所有文件下载完成的回调
         /// </summary>
         private Action<HotAssetsModule> OnDownLoadFinish;
-        
-        private CancellationToken  cancellationToken;
-        
+
+        private CancellationToken cancellationToken;
+
         /// <summary>
         /// 正在下载的文件
         /// </summary>
@@ -64,9 +71,9 @@ namespace XLHFrameWork.XAsset.Runtime.BundleHot
         public AssetsDownLoader(HotAssetsModule assetModule, Queue<HotFileInfo> downLoadQueue, string downloadUrl,
             string hotAssetsSavePath,
             Action<HotFileInfo> onDownLoadSuccess, Action<HotFileInfo> onDownLoadFailed,
-            Action<HotAssetsModule> onDownLoadFinish,CancellationToken cancellationToken)
+            Action<HotAssetsModule> onDownLoadFinish, CancellationToken cancellationToken)
         {
-            this.mCurHotAssetsModule =  assetModule;
+            this.mCurHotAssetsModule = assetModule;
             this.mDownLoadQueue = downLoadQueue;
             this.mAssetsDownLoadUrl = downloadUrl;
             this.mHotAssetsSavePath = hotAssetsSavePath;
@@ -93,6 +100,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleHot
                     tasks.Add(DownLoadAssetBundle(fileInfo));
                 }
             }
+
             UniTask.WhenAll(tasks).Forget();
         }
 
@@ -101,6 +109,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleHot
         /// </summary>
         private void DownLoadNextBundle()
         {
+            
             if (mAllDownLoadFileList.Count > MAX_THREAD_COUNT)
             {
                 Debug.Log("下载数量超出了最大数量... 等待中....");
@@ -154,16 +163,18 @@ namespace XLHFrameWork.XAsset.Runtime.BundleHot
                 string fileSavePath = mHotAssetsSavePath + "/" + fileInfo.abName;
 
                 long localSize = 0;
-                
+
                 string directory = Path.GetDirectoryName(fileSavePath);
                 if (!Directory.Exists(directory))
                     Directory.CreateDirectory(directory);
-                
+
                 if (File.Exists(fileSavePath))
                 {
                     FileInfo fileinfo = new FileInfo(fileSavePath);
                     localSize = fileinfo.Length;
                 }
+
+                float totalBytes = fileInfo.size * 1024f; // KB → Byte
 
                 var handler = new DownloadHandlerFile(fileSavePath, true);
                 handler.removeFileOnAbort = false;
@@ -175,29 +186,42 @@ namespace XLHFrameWork.XAsset.Runtime.BundleHot
                         req.SetRequestHeader("Range", $"bytes={localSize}-");
 
                     var operation = req.SendWebRequest();
+
+                    long lastDownloadedBytes = localSize;
+
                     while (!operation.isDone)
                     {
                         cancellationToken.ThrowIfCancellationRequested();
+
+                        long currentDownloadedBytes = (long)req.downloadedBytes + localSize;
+
+                        long deltaBytes = currentDownloadedBytes - lastDownloadedBytes;
+                        lastDownloadedBytes = currentDownloadedBytes;
+
+                        PrintProgress(fileInfo, currentDownloadedBytes, totalBytes, deltaBytes);
+
                         await UniTask.Yield();
+                    }
+
+                    {
+                        long finalDownloadedBytes = (long)req.downloadedBytes + localSize;
+                        long deltaBytes = finalDownloadedBytes - lastDownloadedBytes; 
+
+                        PrintProgress(fileInfo, finalDownloadedBytes, totalBytes, deltaBytes);
+
+                        Debug.Log($"下载结束 {fileInfo.abName}，最后一段下载 {deltaBytes} 字节");
                     }
 
                     if (req.result != UnityWebRequest.Result.Success)
                         throw new Exception($"下载失败: {req.error}");
 
-                    // MD5 校验
-                    if (!File.Exists(fileSavePath) || MD5.GetMd5FromFile(fileSavePath) != fileInfo.md5)
+                    if (MD5.GetMd5FromFile(fileSavePath) != fileInfo.md5)
                         throw new Exception("文件校验失败");
 
                     OnDownLoadSuccess?.Invoke(fileInfo);
                     mAllDownLoadFileList.Remove(fileInfo);
                     DownLoadNextBundle();
                 }
-            }
-            catch (OperationCanceledException)
-            {
-                Debug.LogWarning($"下载取消: {fileInfo.abName}");
-                OnDownLoadFailed?.Invoke(fileInfo);
-                mAllDownLoadFileList.Remove(fileInfo);
             }
             catch (Exception ex)
             {
@@ -207,5 +231,25 @@ namespace XLHFrameWork.XAsset.Runtime.BundleHot
             }
         }
 
+
+        private void PrintProgress(HotFileInfo fileInfo, long currentDownloadedBytes, float totalBytes, long deltaBytes)
+        {
+            float progress = currentDownloadedBytes / totalBytes;
+
+            float downloadedMB = currentDownloadedBytes / 1024f / 1024f;
+            float totalMB = totalBytes / 1024f / 1024f;
+
+            float speedKB = (deltaBytes / 1024f) / Time.deltaTime;
+
+            /*Debug.Log(
+                $"[{fileInfo.abName}] {downloadedMB:F2}MB / {totalMB:F2}MB ({progress:P0})  " +
+                $"帧增量 {deltaBytes} B | 速度 {speedKB:F1} KB/s"
+            );*/
+            
+            HotAssetsManager.mAllDownLoadAssetsModuleProgress[mCurHotAssetsModule.CurBundleModuleEnum].currentDownLoadSizeM += (deltaBytes/1024f/1024f);
+            HotAssetsManager.mAllDownLoadAssetsModuleProgress[mCurHotAssetsModule.CurBundleModuleEnum]
+                .speedDownLoadSizeM = speedKB / 1024f;
+            Debug.Log(HotAssetsManager.GetDownLoadProgress(mCurHotAssetsModule.CurBundleModuleEnum));
+        }
     }
 }

@@ -2,7 +2,8 @@
     "name": "XAsset",
     "rootNamespace": "",
     "references": [
-        "GUID:f51ebe6a0ceec4240a699833d6309b23"
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:2df6a994cbb86db4bb0249429b8188ab"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

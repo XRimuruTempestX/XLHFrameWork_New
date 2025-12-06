@@ -51,16 +51,30 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
 
 
         private GameObject mRoot;
+        private void Log(string msg)
+        {
+            Debug.Log("[XLHResourceManager] " + msg);
+        }
+        private void LogWarn(string msg)
+        {
+            Debug.LogWarning("[XLHResourceManager] " + msg);
+        }
+        private void LogError(string msg)
+        {
+            Debug.LogError("[XLHResourceManager] " + msg);
+        }
         
         public void Initlizate()
         {
             mRoot = new  GameObject();
             mRoot.name = "PoolRoot";
             GameObject.DontDestroyOnLoad(mRoot);
+            Log("Initlizate done, pool root created name=" + mRoot.name);
         }
 
         public async UniTask<bool> InitAssetModule(BundleModuleEnum bundleModule)
         {
+            Log("InitAssetModule pass-through module=" + bundleModule);
             return await AssetBundleManager.Instance.InitAssetModule(bundleModule);
         }
 
@@ -77,20 +91,24 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
         /// <returns></returns>
         public async UniTask<GameObject> InstantiateAsync(string path, Transform parent)
         {
+            Log("InstantiateAsync start path=" + path + ", parent=" + (parent == null ? "null" : parent.name));
             path = path.EndsWith(".prefab") ? path : path + ".prefab";
+            Log("InstantiateAsync normalized path=" + path);
 
             CacheObject cacheObj = GetCacheObjFromPools(Crc32.GetCrc32(path));
             if (cacheObj != null && cacheObj.obj != null)
             {
+                Log("Pool hit crc=" + cacheObj.crc + ", objId=" + cacheObj.insid + ", name=" + (cacheObj.obj as GameObject)?.name);
                 (cacheObj.obj as GameObject).transform.SetParent(parent);
                 (cacheObj.obj as GameObject).SetActive(true);
                 return cacheObj.obj as  GameObject;
             }
             cacheObj = mCacheObjectPool.Get();
+            Log("Pool miss, loading resource path=" + path);
             GameObject loadObj = await LoadResourceAsync<GameObject>(path);
             if (loadObj == null)
             {
-                Debug.LogError("加载游戏对象失败 -------->" + path);
+                LogError("加载游戏对象失败 path=" + path);
                 GameObject errObj = new GameObject("Load_Error_GameObject");
                 return errObj;
             }
@@ -103,6 +121,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
             cacheObj.obj = instObj;
             mAllObjectDic.TryAdd(insId, cacheObj);
             mAlreadyLoadAssetDic.TryAdd(insId, Crc32.GetCrc32(path));
+            Log("InstantiateAsync done name=" + instObj.name + ", insId=" + insId + ", crc=" + cacheObj.crc);
             return instObj;
         }
 
@@ -115,9 +134,11 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
         public async UniTask<T> LoadAssetAsync<T>(string path, string suffix = "") where T : Object
         {
             path = path + suffix;
+            Log("LoadAssetAsync start path=" + path + ", type=" + typeof(T).Name);
             CacheObject cacheObj = GetCacheObjFromPools(Crc32.GetCrc32(path));
             if (cacheObj != null && cacheObj.obj != null)
             {
+                Log("Pool hit crc=" + cacheObj.crc + ", objId=" + cacheObj.insid);
                 return cacheObj.obj as T;
             }
 
@@ -125,7 +146,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
             T loadObj = await LoadResourceAsync<T>(path);
             if (loadObj == null)
             {
-                Debug.LogError("加载资源失败 -------->" + path);
+                LogError("加载资源失败 path=" + path);
                 return default(T);
             }
             int insId = loadObj.GetInstanceID();
@@ -135,6 +156,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
             cacheObj.obj = loadObj;
             mAllObjectDic.TryAdd(insId, cacheObj);
             mAlreadyLoadAssetDic.TryAdd(insId, Crc32.GetCrc32(path));
+            Log("LoadAssetAsync done objId=" + insId + ", crc=" + cacheObj.crc);
             return loadObj;
         }
 
@@ -148,17 +170,21 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
         {
             if (string.IsNullOrEmpty(path))
             {
-                Debug.LogError("path is null or empty");
+                LogError("path is null or empty");
                 return null;
             }
 
             uint crc = Crc32.GetCrc32(path);
+            Log("LoadResourceAsync start path=" + path + ", crc=" + crc + ", type=" + typeof(T).Name);
 
             BundleItem item = AssetBundleManager.Instance.GetBundleItemByCrc(crc);
             if (item != null)
             {
                 if (item.obj != null)
+                {
+                    Log("BundleItem already has obj, returning cached for path=" + path);
                     return (T)item.obj;
+                }
 
                 T obj = null;
 
@@ -168,26 +194,32 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
                     obj = LoadAssetsFromEditor<T>(path);
                     if (obj == null)
                     {
-                        Debug.LogError("Load object is null : " + path);
+                        LogError("Load object is null path=" + path);
                         return null;
                     }
                     item.obj = obj;
+                    Log("Editor mode load success path=" + path);
                     return obj;
                 }
 #endif
                 item = await AssetBundleManager.Instance.LoadAssetBundle(crc);
                 if (item.obj != null)
                 {
+                    Log("Item.obj present after bundle load path=" + path);
                     return item.obj as T;
                 }
 
+                var sw = new System.Diagnostics.Stopwatch();
+                sw.Start();
                 T loadObj = await item.assetBundle.LoadAssetAsync<T>(item.path) as T;
+                sw.Stop();
+                Log("AssetBundle LoadAssetAsync done assetPath=" + item.path + ", elapsed=" + sw.ElapsedMilliseconds + " ms");
                 return loadObj;
             }
             else
             {
-                Debug.LogError("item is null : " + path);
-                Debug.LogError("item is null : " + crc.ToString());
+                LogError("item is null path=" + path);
+                LogError("item is null crc=" + crc.ToString());
                 return null;
             }
         }
@@ -205,9 +237,11 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
             {
                 CacheObject obj = objectList[^1];
                 objectList.Remove(obj);
+                Log("GetCacheObjFromPools hit crc=" + crc + ", remaining=" + objectList.Count);
                 return obj;
             }
 
+            Log("GetCacheObjFromPools miss crc=" + crc);
             return null;
         }
 
@@ -231,7 +265,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
             mAllObjectDic.TryGetValue(insid, out CacheObject cacheObj);
             if (cacheObj == null)
             {
-                Debug.LogError("这个对象并不是从缓存池中加载 ------------>>>>>" + obj.name);
+                LogError("对象并非从缓存池加载 name=" + obj.name);
                 return;
             }
 
@@ -254,6 +288,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
                 BundleItem item = AssetBundleManager.Instance.GetBundleItemByCrc(crc);
                 AssetBundleManager.Instance.ReleaseAssets(item,true);
                 mAlreadyLoadAssetDic.Remove(insid);
+                Log("Release destroyCache=true insId=" + insid + ", crc=" + crc);
             }
             else
             {
@@ -277,8 +312,9 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
                 }
                 else
                 {
-                    Debug.LogError("缓存obj is null  释放失败");
+                    LogError("缓存obj is null  释放失败");
                 }
+                Log("Release to pool insId=" + insid + ", poolCount=" + (mObjectPoolDic.TryGetValue(crc, out var listTmp) ? listTmp.Count : 0));
             }
         }
 
@@ -292,6 +328,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
 
             if (absoluteCleaning)
             {
+                Log("ClearResourcesAssets absoluteCleaning=true start");
                 foreach (var item in mAllObjectDic)
                 {
                     if (item.Value.obj != null)
@@ -303,9 +340,11 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
                 }
                 mAllObjectDic.Clear();
                 mObjectPoolDic.Clear();
+                Log("Absolute cleaning done");
             }
             else
             {
+                Log("ClearResourcesAssets absoluteCleaning=false start");
                 foreach (var objList in mObjectPoolDic.Values)
                 {
                     if (objList != null)
@@ -322,6 +361,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
                     }
                 }
                 mObjectPoolDic.Clear();
+                Log("Partial cleaning done");
             }
             
             foreach (var crc in mAlreadyLoadAssetDic.Values)
@@ -334,7 +374,8 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
             mAlreadyLoadAssetDic.Clear();
             Resources.UnloadUnusedAssets();
             System.GC.Collect();
+            Log("ClearResourcesAssets finished, absoluteCleaning=" + absoluteCleaning);
         }
-        
+
     }
 }

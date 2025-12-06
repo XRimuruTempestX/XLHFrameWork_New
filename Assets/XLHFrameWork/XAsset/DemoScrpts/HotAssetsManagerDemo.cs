@@ -1,14 +1,16 @@
 ﻿using System;
+using System.Resources;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using XLHFrameWork.XAsset.Config;
 using XLHFrameWork.XAsset.Runtime.BundleHot;
+using XLHFrameWork.XAsset.Runtime.BundleLoad;
 
 namespace XLHFrameWork.XAsset.DemoScrpts
 {
     public class HotAssetsManagerDemo : MonoBehaviour
     {
-        private void Start()
+        private async void Start()
         {
             HotAssetsManager hotAssetsManager = new HotAssetsManager();
             hotAssetsManager.StartHotAsset(BundleModuleEnum.cc, (module) =>
@@ -23,10 +25,16 @@ namespace XLHFrameWork.XAsset.DemoScrpts
             }, (fileinfo) =>
             {
                 Debug.Log($"{fileinfo}下载失败-------->>>>>>>");
-            }, (assetmoudle) =>
+            }, async (assetmoudle) =>
             {
                 Debug.Log("全部下载完成------------>>>>>>>>>>>");
+                XLHResourceManager resourceManager = new XLHResourceManager();
+                await resourceManager.InitAssetModule(BundleModuleEnum.cc);
+                resourceManager.Initlizate();
+                await resourceManager.InstantiateAsync("Assets/Test/Cube (1).prefab",null);
             }).Forget();
+
+            
         }
     }
 }

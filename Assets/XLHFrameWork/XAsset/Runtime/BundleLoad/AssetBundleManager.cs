@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -15,55 +16,61 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
         /// 文件加载路径
         /// </summary>
         public string path;
+
         /// <summary>
         /// 文件加载路径crc
         /// </summary>
         public uint crc;
+
         /// <summary>
         /// AssetBundle名称
         /// </summary>
         public string bundleName;
+
         /// <summary>
         /// 资源名称
         /// </summary>
         public string assetName;
+
         /// <summary>
         /// 是否寻址资源
         /// </summary>
         public bool isAddressableAsset;
+
         /// <summary>
         /// AssetBundle所属的模块
         /// </summary>
         public BundleModuleEnum bundleModuleType;
+
         /// <summary>
         /// AssetBundle依赖项
         /// </summary>
         public List<string> bundleDependce;
+
         /// <summary>
         /// AssetBundle
         /// </summary>
         public AssetBundle assetBundle;
+
         /// <summary>
         /// 通过AssetBundle加载出的对象
         /// </summary>
         public UnityEngine.Object obj;
+
         /// <summary>
         /// 通过AssetBundle加载出的对象数组
         /// </summary>
         public UnityEngine.Object[] objArr;
-        /// <summary>
-        /// 引用计数
-        /// </summary>
-        public int refCount;
+
     }
-    
+
     /// <summary>
     /// AssetBundle缓存
     /// </summary>
     public class AssetBundleCache
     {
         public AssetBundle assetBundle;
-        
+
         public int referenceCount;
 
         public void Release()
@@ -71,52 +78,58 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
             assetBundle = null;
             referenceCount = 0;
         }
-        
     }
-    
+
     public class AssetBundleManager : Singleton<AssetBundleManager>
     {
         /// <summary>
         /// 已经加载的资源模块
         /// </summary>
         private List<BundleModuleEnum> mAlreadyLoadBundleModuleList = new List<BundleModuleEnum>();
+
         /// <summary>
         /// 所有模块的AssetBundle的资源对象字典
         /// </summary>
         private Dictionary<uint, BundleItem> mAllBundleAssetDic = new Dictionary<uint, BundleItem>();
-        
+
         /// <summary>
         /// 所有模块的已经加载过的AssetBundle的资源对象字典
         /// </summary>
-        private Dictionary<string, AssetBundleCache> mAllAlreadyLoadBundleDic = new Dictionary<string, AssetBundleCache>();
+        private Dictionary<string, AssetBundleCache> mAllAlreadyLoadBundleDic =
+            new Dictionary<string, AssetBundleCache>();
+
         /// <summary>
         /// 所有AB模块字典
         /// </summary>
         private Dictionary<string, BundleModuleData> mAllBundleModuleDic = new Dictionary<string, BundleModuleData>();
-        
+
         /// <summary>
         /// 正在加载中的Unitask
         /// </summary>
-        private Dictionary<string, UniTask<AssetBundle>> mLoadUniTaskDic = new Dictionary<string, UniTask<AssetBundle>>();
-        
+        private Dictionary<string, UniTask<AssetBundle>> mLoadUniTaskDic =
+            new Dictionary<string, UniTask<AssetBundle>>();
+
         /// <summary>
         /// 缓存池
         /// </summary>
         private AssetBundleCachePool assetbundleCachePool = new AssetBundleCachePool();
-        
+
         /// <summary>
         /// AssetBundle配置文件加载路径
         /// </summary>
         private string mBundleConfigPath;
+
         /// <summary>
         /// AssetBundle配置文件名称
         /// </summary>
         private string mBundleConfigName;
-        
+
         /// <summary>
         /// AssetBundle配置文件名称
         /// </summary>
         private string mAssetsBundleConfigName;
+
+        private CancellationTokenSource _cancellationTokenSource;
 
         /// <summary>
         /// 加载AssetBundle配置文件
@@ -125,6 +138,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
         /// <returns></returns>
         public async UniTask<bool> InitAssetModule(BundleModuleEnum bundleModule)
         {
+            AssetBundle bundleConfig = null;
             try
             {
                 if (mAlreadyLoadBundleModuleList.Contains(bundleModule))
@@ -133,21 +147,35 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
                     return false;
                 }
 
+                if (_cancellationTokenSource == null)
+                {
+                    _cancellationTokenSource = new CancellationTokenSource();
+                }
+
                 LoadAllBundleModule();
 
                 if (GeneratorBundleConfigPath(bundleModule))
                 {
-                    AssetBundle bundleConfig = null;
                     if (BundleSettings.Instance.bundleEncrypt.isEncrypt)
                     {
-                        bundleConfig = await AssetBundle.LoadFromMemoryAsync(AES.AESFileByteDecrypt(mBundleConfigPath,BundleSettings.Instance.bundleEncrypt.encryptKey));
+                        bundleConfig = await AssetBundle
+                            .LoadFromMemoryAsync(AES.AESFileByteDecrypt(mBundleConfigPath,
+                                BundleSettings.Instance.bundleEncrypt.encryptKey))
+                            .WithCancellation(_cancellationTokenSource.Token);
                     }
                     else
                     {
-                        bundleConfig = await AssetBundle.LoadFromFileAsync(mBundleConfigPath);
+                        bundleConfig = await AssetBundle.LoadFromFileAsync(mBundleConfigPath)
+                            .WithCancellation(_cancellationTokenSource.Token);
                     }
 
-                    string bundleConfigJson = (await bundleConfig.LoadAssetAsync<TextAsset>(mAssetsBundleConfigName) as TextAsset)?.text;
+                    foreach (var allAssetName in bundleConfig.GetAllAssetNames())
+                    {
+                        Debug.Log(allAssetName + "   ------>>>");
+                    }
+                    Debug.Log("mAssetsBundleConfigName = " + mAssetsBundleConfigName);
+                    string bundleConfigJson =
+                        (await bundleConfig.LoadAssetAsync<TextAsset>("Assets/XLHFrameWork/XAsset/Config/ccassetbundleconfig.json") as TextAsset)?.text;
                     mAlreadyLoadBundleModuleList.Add(bundleModule);
                     if (bundleConfigJson != null)
                     {
@@ -171,11 +199,13 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
                                 Debug.LogWarning("AssetBundle Already Exists! BundleName:" + info.bundleName);
                             }
                         }
-                        
+
                         bundleConfig.Unload(false);
                         Debug.Log("初始化AssetModule成功 ： " + bundleModule);
                         return true;
                     }
+                    Debug.LogError("bundleConfigJson is null !!! ");
+
                     return false;
                 }
                 else
@@ -183,6 +213,12 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
                     Debug.LogError("不存在AssetBundleConfig");
                     return false;
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.LogWarning("Load canceled"); // 正常取消
+                bundleConfig?.Unload(true);
+                return false;
             }
             catch (Exception e)
             {
@@ -197,11 +233,12 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
             {
                 return;
             }
-            
+
             TextAsset textAsset = Resources.Load<TextAsset>("bundlemoduleCfg");
             if (textAsset != null)
             {
-                List<BundleModuleData> bundlemoduleDatas = JsonConvert.DeserializeObject<List<BundleModuleData>>(textAsset.text);
+                List<BundleModuleData> bundlemoduleDatas =
+                    JsonConvert.DeserializeObject<List<BundleModuleData>>(textAsset.text);
                 foreach (var item in bundlemoduleDatas)
                 {
                     mAllBundleModuleDic.TryAdd(item.moduleName, item);
@@ -225,6 +262,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
                 if (!File.Exists(mBundleConfigPath))
                     return false;
             }
+
             return true;
         }
 
@@ -243,6 +281,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
                     itemList.Add(item);
                 }
             }
+
             return itemList;
         }
 
@@ -253,7 +292,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
         /// <returns></returns>
         public BundleItem GetBundleItemByCrc(uint crc)
         {
-            mAllBundleAssetDic.TryGetValue(crc,out var item);
+            mAllBundleAssetDic.TryGetValue(crc, out var item);
             return item;
         }
 
@@ -273,29 +312,30 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
                 {
                     return item;
                 }
-                
+
                 //没有存在
-                item.assetBundle = await LoadAssetBundle(item.bundleName,item.bundleModuleType);
+                item.assetBundle = await LoadAssetBundle(item.bundleName, item.bundleModuleType);
 
                 if (item.assetBundle == null)
                 {
                     Debug.LogError("加载AB包失败：" + item.bundleName);
                     return null;
                 }
-                
+
                 //加载依赖包
                 List<UniTask> taskList = new List<UniTask>();
                 foreach (var bundleName in item.bundleDependce)
                 {
-                    taskList.Add(LoadAssetBundle(bundleName,item.bundleModuleType));
+                    taskList.Add(LoadAssetBundle(bundleName, item.bundleModuleType));
                 }
+
                 //到这 该资源的AB包以及依赖包都已经加载 并且存在 mAllBundleAssetDic当中
                 await UniTask.WhenAll(taskList);
                 return item;
             }
             else
             {
-                Debug.LogError("资源不存在 AssetbundleConfig , LoadAssetBundle failed! Crc:"+crc);
+                Debug.LogError("资源不存在 AssetbundleConfig , LoadAssetBundle failed! Crc:" + crc);
                 return null;
             }
         }
@@ -312,46 +352,71 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
             mAllAlreadyLoadBundleDic.TryGetValue(bundleName, out bundle);
             if (bundle == null || (bundle != null && bundle.assetBundle == null))
             {
-                //如果有两个同时加载这个AB包  第二个走这里的逻辑
-                if (bundle != null && mLoadUniTaskDic.TryGetValue(bundleName, out var value))
+                try
                 {
-                    bundle.assetBundle = await value;
-                    bundle.referenceCount++;
-                    return bundle.assetBundle;
-                }
-                
-                bundle = assetbundleCachePool.Get();
-                
-                //计算AssetBundle加载路径
-                string hotFilePath = BundleSettings.Instance.GetHotAssetsPath(bundleModuleType) + bundleName;
-                bool isHotPath = File.Exists(hotFilePath);
-                string bundlePath = isHotPath ? hotFilePath : BundleSettings.Instance.GetAssetsDecompressPath(bundleModuleType) + bundleName;
+                    bundle = assetbundleCachePool.Get();
+                    //计算AssetBundle加载路径
+                    string hotFilePath = BundleSettings.Instance.GetHotAssetsPath(bundleModuleType) + bundleName;
+                    bool isHotPath = File.Exists(hotFilePath);
+                    string bundlePath = isHotPath
+                        ? hotFilePath
+                        : BundleSettings.Instance.GetAssetsDecompressPath(bundleModuleType) + bundleName;
 
-                if (BundleSettings.Instance.bundleEncrypt.isEncrypt)
-                {
-                    byte[] bytes = AES.AESFileByteDecrypt(bundlePath, BundleSettings.Instance.bundleEncrypt.encryptKey);
-                    bundle.assetBundle = await AssetBundle.LoadFromMemoryAsync(bytes);
+                    if (BundleSettings.Instance.bundleEncrypt.isEncrypt)
+                    {
+                        byte[] bytes = AES.AESFileByteDecrypt(bundlePath,
+                            BundleSettings.Instance.bundleEncrypt.encryptKey);
+
+                        if (mLoadUniTaskDic.TryGetValue(bundleName, out var task))
+                        {
+                            bundle.assetBundle = await task;
+                        }
+                        else
+                        {
+                            var assetUniTask = AssetBundle.LoadFromMemoryAsync(bytes)
+                                .ToUniTask(cancellationToken: _cancellationTokenSource.Token);
+                            mLoadUniTaskDic.TryAdd(bundleName, assetUniTask);
+                            bundle.assetBundle = await assetUniTask;
+                        }
+                    }
+                    else
+                    {
+                        if (mLoadUniTaskDic.TryGetValue(bundleName, out var task))
+                        {
+                            bundle.assetBundle = await task;
+                        }
+                        else
+                        {
+                            var assetUniTask = AssetBundle.LoadFromFileAsync(hotFilePath)
+                                .ToUniTask(cancellationToken: _cancellationTokenSource.Token);
+                            mLoadUniTaskDic.TryAdd(bundleName, assetUniTask);
+                            bundle.assetBundle = await assetUniTask;
+                        }
+                    }
+
+                    if (bundle.assetBundle == null)
+                    {
+                        Debug.LogError("AssetBundle load failed bundlePath:" + bundlePath);
+                        return null;
+                    }
+
+                    //AssetBundle引用计数增加
+                    bundle.referenceCount++;
+                    mAllAlreadyLoadBundleDic.Add(bundleName, bundle);
                 }
-                else
+                catch (OperationCanceledException e)
                 {
-                    bundle.assetBundle = await AssetBundle.LoadFromFileAsync(hotFilePath);
+                    Debug.LogError("加载任务取消 : " + e.Message);
+                    bundle?.assetBundle?.Unload(true);
                 }
-                
-                if (bundle.assetBundle ==null)
-                {
-                    Debug.LogError("AssetBundle load failed bundlePath:"+ bundlePath);
-                    return null;
-                }
-                //AssetBundle引用计数增加
-                bundle.referenceCount++;
-                mAllAlreadyLoadBundleDic.Add(bundleName,bundle);
             }
             else
             {
                 //已经加载过了
                 bundle.referenceCount++;
             }
-            return bundle.assetBundle;
+
+            return bundle?.assetBundle;
         }
 
         /// <summary>
@@ -361,8 +426,55 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
         /// <param name="unLoad"></param>
         public void ReleaseAssets(BundleItem assetItem, bool unLoad)
         {
-            //if(assetItem != null)
+            if (assetItem != null)
+            {
+                if (assetItem.obj != null)
+                    assetItem.obj = null;
+                if (assetItem.objArr != null)
+                    assetItem.objArr = null;
+
+                
+                ReleaseAssetBundle(assetItem, unLoad);
+
+                if (assetItem.bundleDependce != null)
+                {
+                    foreach (var bundleName in assetItem.bundleDependce)
+                    {
+                        ReleaseAssetBundle(null, unLoad, bundleName);
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogError(" assetitem is null, release Assets failed!");
+            }
         }
-        
+
+        public void CancleToken()
+        {
+            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource?.Dispose();
+            _cancellationTokenSource = null;
+        }
+
+        private void ReleaseAssetBundle(BundleItem assetItem, bool unLoad, string bundleName = "")
+        {
+            string assetBundleName = assetItem == null ? bundleName : assetItem.bundleName;
+            if (!string.IsNullOrEmpty(assetBundleName) &&
+                mAllAlreadyLoadBundleDic.TryGetValue(assetBundleName, out var bundleCacheItem))
+            {
+                if (bundleCacheItem.assetBundle != null)
+                {
+                    bundleCacheItem.referenceCount--;
+                    if (bundleCacheItem.referenceCount <= 0)
+                    {
+                        bundleCacheItem.assetBundle.Unload(unLoad);
+                        mAllAlreadyLoadBundleDic.Remove(assetBundleName);
+                        assetbundleCachePool.Release(bundleCacheItem);
+                        mLoadUniTaskDic.Remove(assetBundleName);
+                    }
+                }
+            }
+        }
     }
 }

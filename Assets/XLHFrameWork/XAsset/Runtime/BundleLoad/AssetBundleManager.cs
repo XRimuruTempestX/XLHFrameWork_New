@@ -112,7 +112,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
         /// <summary>
         /// 缓存池
         /// </summary>
-        private AssetBundleCachePool assetbundleCachePool = new AssetBundleCachePool();
+        private AssetBundleCachePool assetbundleCachePool = new AssetBundleCachePool(5000);
 
         /// <summary>
         /// AssetBundle配置文件加载路径
@@ -175,7 +175,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
                     }
                     Debug.Log("mAssetsBundleConfigName = " + mAssetsBundleConfigName);
                     string bundleConfigJson =
-                        (await bundleConfig.LoadAssetAsync<TextAsset>("Assets/XLHFrameWork/XAsset/Config/ccassetbundleconfig.json") as TextAsset)?.text;
+                        (await bundleConfig.LoadAssetAsync<TextAsset>(mAssetsBundleConfigName) as TextAsset)?.text;
                     mAlreadyLoadBundleModuleList.Add(bundleModule);
                     if (bundleConfigJson != null)
                     {
@@ -253,7 +253,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
         /// <returns></returns>
         private bool GeneratorBundleConfigPath(BundleModuleEnum bundleModule)
         {
-            mAssetsBundleConfigName = bundleModule.ToString().ToLower() + "assetbundleconfig";
+            mAssetsBundleConfigName = "Assets/XLHFrameWork/XAsset/Config/" + bundleModule.ToString().ToLower() + "assetbundleconfig.json";
             mBundleConfigName = bundleModule.ToString().ToLower() + "bundleconfig" + BundleSettings.Instance.ABSUFFIX;
             mBundleConfigPath = BundleSettings.Instance.GetHotAssetsPath(bundleModule) + mBundleConfigName;
             if (!File.Exists(mBundleConfigPath))

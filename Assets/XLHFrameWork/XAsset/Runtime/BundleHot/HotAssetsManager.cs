@@ -207,7 +207,8 @@ namespace XLHFrameWork.XAsset.Runtime.BundleHot
                 MultipleThreadBalancing();
             }
 
-            //TODO... 下载完成后立马初始化框架
+            /*//TODO... 下载完成后立马初始化框架
+            XAsset.Instance.InitlizateResAsync(bundleModule.CurBundleModuleEnum).Forget();*/
         }
 
         /// <summary>

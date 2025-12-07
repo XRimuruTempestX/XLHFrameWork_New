@@ -7,9 +7,7 @@
       "assetName": "Cube (1).prefab",
       "bundleModule": "cc",
       "isAddressableAsset": false,
-      "bundleDependce": [
-        "cc_cube (1)"
-      ]
+      "bundleDependce": []
     },
     {
       "path": "Packages/com.unity.render-pipelines.universal/Runtime/Materials/Lit.mat",
@@ -18,9 +16,7 @@
       "assetName": "Lit.mat",
       "bundleModule": "cc",
       "isAddressableAsset": false,
-      "bundleDependce": [
-        "cc_cube (1)"
-      ]
+      "bundleDependce": []
     },
     {
       "path": "Packages/com.unity.render-pipelines.universal/Shaders/Lit.shader",
@@ -58,9 +54,7 @@
       "assetName": "Image.prefab",
       "bundleModule": "cc",
       "isAddressableAsset": false,
-      "bundleDependce": [
-        "cc_image"
-      ]
+      "bundleDependce": []
     },
     {
       "path": "Assets/XLHFrameWork/XAsset/Config/ccassetbundleconfig.json",

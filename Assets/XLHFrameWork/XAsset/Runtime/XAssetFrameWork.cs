@@ -5,6 +5,7 @@ using XLHFrameWork.XAsset.Config;
 using XLHFrameWork.XAsset.Runtime.BundleHot;
 using XLHFrameWork.XAsset.Runtime.BundleLoad;
 using XLHFrameWork.XAsset.Runtime.Helper;
+using Object = UnityEngine.Object;
 
 namespace XLHFrameWork.XAsset.Runtime
 {
@@ -63,6 +64,37 @@ namespace XLHFrameWork.XAsset.Runtime
         public async UniTask<GameObject> InstantiateAsync(string path,Transform parent = null)
         {
             return await mResourceMgr.InstantiateAsync(path,parent);
+        }
+
+
+        /// <summary>
+        /// 加载非实例化资源
+        /// </summary>
+        /// <param name="path"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public async UniTask<T> LoadAssetAsync<T>(string path)  where T : Object
+        {
+            return await mResourceMgr.LoadAssetAsync<T>(path);
+        }
+
+        /// <summary>
+        /// 释放实例化的资源
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="isDestroy">false 放入缓存池中  , true 销毁实例化的资源</param>
+        public void ReleaseGameObject(GameObject obj , bool isDestroy = false)
+        {
+            mResourceMgr.Release(obj, isDestroy);
+        }
+
+        /// <summary>
+        /// 清空所有加载的资源   
+        /// </summary>
+        /// <param name="isClearAll">false 不会释放已经加载的资源，  true 释放所有由框架加载的资源</param>
+        public void ReleaseAllAssets(bool isClearAll = false)
+        {
+            mResourceMgr.ClearResourcesAssets(isClearAll);
         }
     }
 }

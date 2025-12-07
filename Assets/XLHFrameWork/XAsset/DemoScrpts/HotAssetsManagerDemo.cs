@@ -11,6 +11,11 @@ namespace XLHFrameWork.XAsset.DemoScrpts
 {
     public class HotAssetsManagerDemo : MonoBehaviour
     {
+
+        private GameObject obj1;
+        private GameObject obj2;
+        private GameObject obj3;
+        
         private async void Start()
         {
             /*HotAssetsManager hotAssetsManager = new HotAssetsManager();
@@ -43,8 +48,37 @@ namespace XLHFrameWork.XAsset.DemoScrpts
                 {
                     Debug.Log("全部下载完成------------>>>>>>>>>>>");
                     await XAssetFrameWork.Instance.InitlizateResAsync(BundleModuleEnum.cc);
-                    await XAssetFrameWork.Instance.InstantiateAsync("Assets/Test/Image.prefab", null);
+                    obj1 = await XAssetFrameWork.Instance.InstantiateAsync("Assets/Test/Cube.prefab", null);
+                    obj2 = await XAssetFrameWork.Instance.InstantiateAsync("Assets/Test/Cube.prefab", null);
+                    obj3 = await XAssetFrameWork.Instance.InstantiateAsync("Assets/Test/Cube.prefab", null);
                 });
+        }
+
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.D))
+            {
+                XAssetFrameWork.Instance.ReleaseGameObject(obj1, true);
+            }
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                XAssetFrameWork.Instance.ReleaseGameObject(obj2, false);
+            }
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                XAssetFrameWork.Instance.ReleaseGameObject(obj3, false);
+            }
+
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                XAssetFrameWork.Instance.InstantiateAsync("Assets/Test/Image.prefab", null).Forget();
+            }
+            
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                XAssetFrameWork.Instance.ReleaseAllAssets();
+            }
         }
     }
 }

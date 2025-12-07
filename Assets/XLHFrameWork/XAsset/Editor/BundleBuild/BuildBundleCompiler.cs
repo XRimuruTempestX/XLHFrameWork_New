@@ -491,7 +491,7 @@ namespace XLHFrameWork.XAsset.Editor.BundleBuild
                             if (allBundleFilePathDic.TryGetValue(dePath,out var assetBundleName))
                             {
                                 //如果依赖项已经包含这个AssetBundle就不进行处理，否则添加进依赖项
-                                if (!info.bundleDependce.Contains(assetBundleName))
+                                if (!info.bundleDependce.Contains(assetBundleName) && !string.Equals(assetBundleName,item.Value))
                                 {
                                     info.bundleDependce.Add(assetBundleName);
                                 }

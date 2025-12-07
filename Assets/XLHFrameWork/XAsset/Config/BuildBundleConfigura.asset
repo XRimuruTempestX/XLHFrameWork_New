@@ -18,8 +18,19 @@ MonoBehaviour:
     isAddressableAsset: 0
     isBuild: 0
     isAddModule: 0
-    lastClickBtnTime: 87644.26
+    lastClickBtnTime: 0
     prefabPathArr:
     - Assets/Test
     rootFolderPathArr: []
     singleFolderPathArr: []
+  - bundleid: 0
+    moduleName: WindowModule
+    isAddressableAsset: 0
+    isBuild: 1
+    isAddModule: 0
+    lastClickBtnTime: 4929.6846
+    prefabPathArr:
+    - Assets/XLHFrameWork/UIFrameWork/UIFrameWorkConfig/UIBasePrefabs
+    rootFolderPathArr: []
+    singleFolderPathArr:
+    - Assets/XLHFrameWork/UIFrameWork/UIFrameWorkConfig

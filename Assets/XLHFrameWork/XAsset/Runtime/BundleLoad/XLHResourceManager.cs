@@ -9,7 +9,6 @@ using Object = UnityEngine.Object;
 
 namespace XLHFrameWork.XAsset.Runtime.BundleLoad
 {
-
     public class CacheObject
     {
         public uint crc;
@@ -25,25 +24,24 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
             obj = null;
         }
     }
-    
+
     public class XLHResourceManager : IResourceInterface
     {
-        
         /// <summary>
         /// 对象池字典
         /// </summary>
-        private Dictionary<uint, List<CacheObject>> mObjectPoolDic =  new Dictionary<uint, List<CacheObject>>();
-        
+        private Dictionary<uint, List<CacheObject>> mObjectPoolDic = new Dictionary<uint, List<CacheObject>>();
+
         /// <summary>
         /// 记录加载出来的对象的缓存对象
         /// </summary>
         private Dictionary<int, CacheObject> mAllObjectDic = new Dictionary<int, CacheObject>();
-        
+
         /// <summary>
-        /// 已经加载出来的对象id ---> crc
+        /// 已经加载出来的对象crc ---> id
         /// </summary>
-        private Dictionary<int, uint> mAlreadyLoadAssetDic = new Dictionary<int, uint>();
-        
+        private Dictionary<uint, List<int>> mAlreadyLoadAssetDic = new Dictionary<uint, List<int>>();
+
         /// <summary>
         /// 缓存对象类对象池
         /// </summary>
@@ -51,22 +49,25 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
 
 
         private GameObject mRoot;
+
         private void Log(string msg)
         {
             Debug.Log("[XLHResourceManager] " + msg);
         }
+
         private void LogWarn(string msg)
         {
             Debug.LogWarning("[XLHResourceManager] " + msg);
         }
+
         private void LogError(string msg)
         {
             Debug.LogError("[XLHResourceManager] " + msg);
         }
-        
+
         public void Initlizate()
         {
-            mRoot = new  GameObject();
+            mRoot = new GameObject();
             mRoot.name = "PoolRoot";
             GameObject.DontDestroyOnLoad(mRoot);
             Log("Initlizate done, pool root created name=" + mRoot.name);
@@ -98,11 +99,13 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
             CacheObject cacheObj = GetCacheObjFromPools(Crc32.GetCrc32(path));
             if (cacheObj != null && cacheObj.obj != null)
             {
-                Log("Pool hit crc=" + cacheObj.crc + ", objId=" + cacheObj.insid + ", name=" + (cacheObj.obj as GameObject)?.name);
+                Log("Pool hit crc=" + cacheObj.crc + ", objId=" + cacheObj.insid + ", name=" +
+                    (cacheObj.obj as GameObject)?.name);
                 (cacheObj.obj as GameObject).transform.SetParent(parent);
                 (cacheObj.obj as GameObject).SetActive(true);
-                return cacheObj.obj as  GameObject;
+                return cacheObj.obj as GameObject;
             }
+
             cacheObj = mCacheObjectPool.Get();
             Log("Pool miss, loading resource path=" + path);
             GameObject loadObj = await LoadResourceAsync<GameObject>(path);
@@ -120,7 +123,23 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
             cacheObj.insid = insId;
             cacheObj.obj = instObj;
             mAllObjectDic.TryAdd(insId, cacheObj);
-            mAlreadyLoadAssetDic.TryAdd(insId, Crc32.GetCrc32(path));
+            if (mAlreadyLoadAssetDic.TryGetValue(Crc32.GetCrc32(path), out List<int> list))
+            {
+                if (list == null)
+                {
+                    list = new List<int>();
+                    list.Add(cacheObj.insid);
+                }
+                else
+                {
+                    list.Add(cacheObj.insid);
+                }
+            }
+            else
+            {
+                mAlreadyLoadAssetDic.Add(Crc32.GetCrc32(path), new List<int>() { cacheObj.insid });
+            }
+
             Log("InstantiateAsync done name=" + instObj.name + ", insId=" + insId + ", crc=" + cacheObj.crc);
             return instObj;
         }
@@ -149,13 +168,30 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
                 LogError("加载资源失败 path=" + path);
                 return default(T);
             }
+
             int insId = loadObj.GetInstanceID();
             cacheObj.crc = Crc32.GetCrc32(path);
             cacheObj.path = path;
             cacheObj.insid = insId;
             cacheObj.obj = loadObj;
             mAllObjectDic.TryAdd(insId, cacheObj);
-            mAlreadyLoadAssetDic.TryAdd(insId, Crc32.GetCrc32(path));
+            if (mAlreadyLoadAssetDic.TryGetValue(Crc32.GetCrc32(path), out List<int> list))
+            {
+                if (list == null)
+                {
+                    list = new List<int>();
+                    list.Add(cacheObj.insid);
+                }
+                else
+                {
+                    list.Add(cacheObj.insid);
+                }
+            }
+            else
+            {
+                mAlreadyLoadAssetDic.Add(Crc32.GetCrc32(path), new List<int>() { cacheObj.insid });
+            }
+
             Log("LoadAssetAsync done objId=" + insId + ", crc=" + cacheObj.crc);
             return loadObj;
         }
@@ -197,6 +233,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
                         LogError("Load object is null path=" + path);
                         return null;
                     }
+
                     item.obj = obj;
                     Log("Editor mode load success path=" + path);
                     return obj;
@@ -213,7 +250,8 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
                 sw.Start();
                 T loadObj = await item.assetBundle.LoadAssetAsync<T>(item.path) as T;
                 sw.Stop();
-                Log("AssetBundle LoadAssetAsync done assetPath=" + item.path + ", elapsed=" + sw.ElapsedMilliseconds + " ms");
+                Log("AssetBundle LoadAssetAsync done assetPath=" + item.path + ", elapsed=" + sw.ElapsedMilliseconds +
+                    " ms");
                 return loadObj;
             }
             else
@@ -261,7 +299,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
         public void Release(GameObject obj, bool destroyCache = false)
         {
             int insid = obj.GetInstanceID();
-            
+
             mAllObjectDic.TryGetValue(insid, out CacheObject cacheObj);
             if (cacheObj == null)
             {
@@ -270,7 +308,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
             }
 
             uint crc = cacheObj.crc;
-            
+
             if (destroyCache)
             {
                 GameObject.Destroy(obj);
@@ -282,18 +320,38 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
                     {
                         objectList.Remove(cacheObj);
                     }
+                    Log("Release From Pool destroyCache=true insId=" + insid + ", crc=" + crc);
                     mCacheObjectPool.Release(cacheObj);
                 }
-                //如果池子已经没有这个对象
-                BundleItem item = AssetBundleManager.Instance.GetBundleItemByCrc(crc);
-                AssetBundleManager.Instance.ReleaseAssets(item,true);
-                mAlreadyLoadAssetDic.Remove(insid);
+                
                 Log("Release destroyCache=true insId=" + insid + ", crc=" + crc);
+                
+                if (mAlreadyLoadAssetDic.TryGetValue(cacheObj.crc, out List<int> insIdList))
+                {
+                    if (insIdList != null)
+                    {
+                        foreach (int insId in insIdList)
+                        {
+                            if (insId == cacheObj.insid)
+                            {
+                                insIdList.Remove(insId);
+                                break;
+                            }
+                        }
+
+                        if (insIdList.Count == 0)
+                        {
+                            mAlreadyLoadAssetDic.Remove(cacheObj.crc);
+                            BundleItem item = AssetBundleManager.Instance.GetBundleItemByCrc(crc);
+                            AssetBundleManager.Instance.ReleaseAssets(item, true);
+                        }
+                    }
+                }
             }
             else
             {
-             //   mAllObjectDic.TryGetValue(insid, out var cacheObejct);
-                mObjectPoolDic.TryGetValue(crc,out var objectList);
+                //   mAllObjectDic.TryGetValue(insid, out var cacheObejct);
+                mObjectPoolDic.TryGetValue(crc, out var objectList);
                 //如果池子还没有
                 if (objectList == null)
                 {
@@ -303,18 +361,24 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
                 }
                 else
                 {
-                    objectList.Add(cacheObj);
+                    if (!objectList.Contains(cacheObj))
+                    {
+                        objectList.Add(cacheObj);
+                    }
                 }
 
                 if (cacheObj.obj != null)
                 {
+                    (cacheObj.obj as GameObject)?.SetActive(false);
                     (cacheObj.obj as GameObject)?.transform.SetParent(mRoot.transform);
                 }
                 else
                 {
                     LogError("缓存obj is null  释放失败");
                 }
-                Log("Release to pool insId=" + insid + ", poolCount=" + (mObjectPoolDic.TryGetValue(crc, out var listTmp) ? listTmp.Count : 0));
+
+                Log("Release to pool insId=" + insid + ", poolCount=" +
+                    (mObjectPoolDic.TryGetValue(crc, out var listTmp) ? listTmp.Count : 0));
             }
         }
 
@@ -325,7 +389,6 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
 
         public void ClearResourcesAssets(bool absoluteCleaning)
         {
-
             if (absoluteCleaning)
             {
                 Log("ClearResourcesAssets absoluteCleaning=true start");
@@ -333,11 +396,12 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
                 {
                     if (item.Value.obj != null)
                     {
-                        //销毁Gameobject对象，回收缓存类对象，等待下次复用
-                        GameObject.Destroy(item.Value.obj as  GameObject);
+                        if (item.Value.obj is GameObject)
+                            GameObject.Destroy(item.Value.obj as GameObject);
                         mCacheObjectPool.Release(item.Value);
                     }
                 }
+
                 mAllObjectDic.Clear();
                 mObjectPoolDic.Clear();
                 Log("Absolute cleaning done");
@@ -345,6 +409,21 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
             else
             {
                 Log("ClearResourcesAssets absoluteCleaning=false start");
+
+                /*foreach (var insList in mAlreadyLoadAssetDic.Values)
+                {
+                    foreach (var item in insList)
+                    {
+                        if (mAllObjectDic.TryGetValue(item, out var cacheObj))
+                        {
+                            if (cacheObj.obj is GameObject)
+                            {
+                                Release(cacheObj.obj as GameObject, false);
+                            }
+                        }
+                    }
+                }*/
+                
                 foreach (var objList in mObjectPoolDic.Values)
                 {
                     if (objList != null)
@@ -354,20 +433,22 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
                             if (cacheObejct != null)
                             {
                                 //销毁Gameobject对象，回收缓存类对象，等待下次复用
-                                GameObject.Destroy(cacheObejct.obj as  GameObject);
+                                if(cacheObejct.obj is GameObject)
+                                    GameObject.Destroy(cacheObejct.obj as GameObject);
                                 mCacheObjectPool.Release(cacheObejct);
                             }
                         }
                     }
                 }
+                mAllObjectDic.Clear();
                 mObjectPoolDic.Clear();
                 Log("Partial cleaning done");
             }
-            
-            foreach (var crc in mAlreadyLoadAssetDic.Values)
+
+            foreach (var crc in mAlreadyLoadAssetDic.Keys)
             {
-                BundleItem item =  AssetBundleManager.Instance.GetBundleItemByCrc(crc);
-                AssetBundleManager.Instance.ReleaseAssets(item,absoluteCleaning);
+                BundleItem item = AssetBundleManager.Instance.GetBundleItemByCrc(crc);
+                AssetBundleManager.Instance.ReleaseAssets(item, absoluteCleaning);
             }
 
             //清理列表
@@ -376,6 +457,5 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
             System.GC.Collect();
             Log("ClearResourcesAssets finished, absoluteCleaning=" + absoluteCleaning);
         }
-
     }
 }

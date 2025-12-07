@@ -14,7 +14,7 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
 
         UniTask<GameObject> InstantiateAsync(string path,Transform parent);
         
-        UniTask<T> LoadResourceAsync<T>(string path) where T : Object;
+        UniTask<T> LoadAssetAsync<T>(string path, string suffix = "") where T : Object;
 
         void Release(GameObject obj, bool destroyCache = false);
         

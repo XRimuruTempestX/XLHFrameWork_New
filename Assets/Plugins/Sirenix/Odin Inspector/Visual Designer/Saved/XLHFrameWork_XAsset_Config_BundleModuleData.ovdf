@@ -1,0 +1,55 @@
+OVDF v1.0
+XLHFrameWork.XAsset.Config.BundleModuleData, XAsset
+
+# $61q3wdjwoQrK3Rf6jYJpa1
+Position: $root:3
++ [Sirenix.OdinInspector.TitleGroupAttribute]
+	BoldTitle = True
+	AnimateVisibility = True
+	HideWhenChildrenAreInvisible = True
+	VisibleIf = ""
+	GroupName = ""
+
+# bundleid
+Visibility: Hidden
++ [Sirenix.OdinInspector.LabelTextAttribute]
+
+# moduleName
+Position: $61q3wdjwoQrK3Rf6jYJpa1:0
++ [Sirenix.OdinInspector.LabelTextAttribute]
+	Text = "模块名称"
+
+# isAddressableAsset
+Position: $61q3wdjwoQrK3Rf6jYJpa1:1
++ [Sirenix.OdinInspector.LabelTextAttribute]
+	Text = "是否可寻址"
+
+# isBuild
+Position: $61q3wdjwoQrK3Rf6jYJpa1:2
++ [Sirenix.OdinInspector.LabelTextAttribute]
+	Text = "是否打包"
+
+# isAddModule
+Visibility: Hidden
+
+# lastClickBtnTime
+Visibility: Hidden
+
+# prefabPathArr
+Position: $61q3wdjwoQrK3Rf6jYJpa1:3
++ [Sirenix.OdinInspector.LabelTextAttribute]
+	Text = "预制体根路径"
++ [Sirenix.OdinInspector.FolderPathAttribute]
+	AbsolutePath = False
+
+# rootFolderPathArr
+Position: $61q3wdjwoQrK3Rf6jYJpa1:4
++ [Sirenix.OdinInspector.LabelTextAttribute]
+	Text = "资源文件夹根路径"
++ [Sirenix.OdinInspector.FolderPathAttribute]
+
+# singleFolderPathArr
+Position: $61q3wdjwoQrK3Rf6jYJpa1:5
++ [Sirenix.OdinInspector.LabelTextAttribute]
+	Text = "单个文件夹路径"
++ [Sirenix.OdinInspector.FolderPathAttribute]

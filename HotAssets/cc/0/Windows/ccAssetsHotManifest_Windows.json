@@ -1,0 +1,42 @@
+{
+  "updateNotice": "",
+  "appVersion": "",
+  "downLoadURL": "http://47.115.129.94/HotAssets/cc//0/Windows",
+  "hotAssetsPatchList": [
+    {
+      "patchVersion": 0,
+      "hotAssetsList": [
+        {
+          "abName": "buildlogtep.json",
+          "md5": "46CDCB89337591C743FD1A9144B14DD4",
+          "size": 0.009765625
+        },
+        {
+          "abName": "ccbundleconfig",
+          "md5": "46CDCB89337591C743FD1A9144B14DD4",
+          "size": 0.009765625
+        },
+        {
+          "abName": "ccdata.json",
+          "md5": "46CDCB89337591C743FD1A9144B14DD4",
+          "size": 0.009765625
+        },
+        {
+          "abName": "cc_cube",
+          "md5": "46CDCB89337591C743FD1A9144B14DD4",
+          "size": 0.009765625
+        },
+        {
+          "abName": "cc_cube (1)",
+          "md5": "46CDCB89337591C743FD1A9144B14DD4",
+          "size": 0.009765625
+        },
+        {
+          "abName": "cc_image",
+          "md5": "46CDCB89337591C743FD1A9144B14DD4",
+          "size": 0.009765625
+        }
+      ]
+    }
+  ]
+}

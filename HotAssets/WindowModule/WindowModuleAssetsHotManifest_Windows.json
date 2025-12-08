@@ -1,0 +1,27 @@
+{
+  "updateNotice": "1",
+  "appVersion": "0.1.0",
+  "downLoadURL": "http://47.115.129.94/HotAssets/WindowModule/0.1.0/0/Windows",
+  "hotAssetsPatchList": [
+    {
+      "patchVersion": 0,
+      "hotAssetsList": [
+        {
+          "abName": "windowmodulebundleconfig.cc",
+          "md5": "4966A98E9CDF6DA2CE8AC641F0049B7E",
+          "size": 1.50976563
+        },
+        {
+          "abName": "windowmodule_uibaseprefabs.cc",
+          "md5": "C7E0A7353D9E8421074984B8DEDCE456",
+          "size": 5.1484375
+        },
+        {
+          "abName": "windowmodule_uipathconfig.cc",
+          "md5": "1CCDABDF5258ABDA05BAC599AC749B43",
+          "size": 1.9765625
+        }
+      ]
+    }
+  ]
+}

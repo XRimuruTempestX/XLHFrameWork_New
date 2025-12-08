@@ -1,0 +1,92 @@
+OVDF v1.0
+XLHFrameWork.XAsset.Editor.BundleBuild.BuildBundleConfigura, XAsset.Editor
+
+# $UUfDrhRdMTyW5JPi8yZTsb
+Position: $Eyrrevcv5uA6KtVqiPt8U8:0
++ [Sirenix.OdinInspector.ButtonGroupAttribute]
+	ButtonHeight = 0
+
+# $Vt9gog6gV1Ak1djrLwSfCW
+Position: $root:3
++ [Sirenix.OdinInspector.ShowIfGroupAttribute]
+	GroupName = "HotPatchBuild"
+	VisibleIf = "showBuildHotPathBtn"
+
+# $8wxvKuDQyuRzWymYy22nXL
+Position: $Vt9gog6gV1Ak1djrLwSfCW:0
++ [Sirenix.OdinInspector.ButtonGroupAttribute]
+
+# $RxgvMUNoe6bAeKsBZ8FPMK
+Position: $VvRq5R9SVJ2UGCSuKGmwPy:0
++ [Sirenix.OdinInspector.TitleGroupAttribute]
+	GroupName = "热更补丁信息配置"
+
+# $VvRq5R9SVJ2UGCSuKGmwPy
+Position: $root:2
++ [Sirenix.OdinInspector.BoxGroupAttribute]
+
+# $Eyrrevcv5uA6KtVqiPt8U8
+Position: $root:12
++ [Sirenix.OdinInspector.ShowIfGroupAttribute]
+	VisibleIf = "showAssetBundleBtn"
+
+# TestBtn
++ [Sirenix.OdinInspector.ButtonAttribute]
+	buttonHeight = 30
+	HasDefinedButtonHeight = True
+	Name = "cc"
+
+# AssetBundleBuild
+Position: $UUfDrhRdMTyW5JPi8yZTsb:0
++ [Sirenix.OdinInspector.ButtonAttribute]
+	Name = "打包AssetBundle"
+	Style = CompactBox
+	stretch = True
+	HasDefinedStretch = True
+	Expanded = False
+	buttonHeight = 40
+	HasDefinedButtonHeight = True
++ [Sirenix.OdinInspector.GUIColorAttribute]
+	Color = #20FF00FF
+
+# EnbeddedAssetBundle
+Position: $UUfDrhRdMTyW5JPi8yZTsb:1
++ [Sirenix.OdinInspector.ButtonAttribute]
+	Name = "内嵌资源"
+	buttonHeight = 40
+	HasDefinedButtonHeight = True
++ [Sirenix.OdinInspector.GUIColorAttribute]
+	Color = #0DFF00FF
+
+# BuildHotPatch
+Position: $8wxvKuDQyuRzWymYy22nXL:0
++ [Sirenix.OdinInspector.ButtonAttribute]
+	Name = "打包热更补丁"
+	buttonHeight = 40
+	HasDefinedButtonHeight = True
++ [Sirenix.OdinInspector.GUIColorAttribute]
+	Color = #D1FF00FF
+
+# UpdateHotPatchToServe
+Position: $8wxvKuDQyuRzWymYy22nXL:1
++ [Sirenix.OdinInspector.ButtonAttribute]
+	Name = "上传补丁文件"
+	buttonHeight = 40
+	HasDefinedButtonHeight = True
++ [Sirenix.OdinInspector.GUIColorAttribute]
+	Color = #CDFF00FF
+
+# notice
+Position: $RxgvMUNoe6bAeKsBZ8FPMK:4
+
+# appVersion
+Position: $RxgvMUNoe6bAeKsBZ8FPMK:3
+
+# hotPatchVersion
+Position: $RxgvMUNoe6bAeKsBZ8FPMK:2
+
+# showBuildHotPathBtn
+Position: $RxgvMUNoe6bAeKsBZ8FPMK:1
+
+# showAssetBundleBtn
+Position: $RxgvMUNoe6bAeKsBZ8FPMK:0

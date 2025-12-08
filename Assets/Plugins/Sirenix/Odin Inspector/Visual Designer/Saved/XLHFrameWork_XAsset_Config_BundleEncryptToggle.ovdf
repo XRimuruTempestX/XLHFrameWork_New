@@ -1,0 +1,14 @@
+OVDF v1.0
+XLHFrameWork.XAsset.Config.BundleEncryptToggle, XAsset
+
+# encryptKey
++ [Sirenix.OdinInspector.ShowIfAttribute]
+	Condition = "isEncrypt"
++ [Sirenix.OdinInspector.LabelTextAttribute]
+	Text = "加密密钥"
+
+# isEncrypt
++ [Sirenix.OdinInspector.LabelTextAttribute]
+	Text = "是否加密"
+	Icon = ShieldLock
+	IconColor = "green"

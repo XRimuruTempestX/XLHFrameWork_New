@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -108,7 +109,66 @@ namespace XLHFrameWork.XAsset.Editor.BundleBuild
         {
             return AssetBundleConfig.Any(x => x.moduleName == moduleName);
         }
+
+
+        public bool showAssetBundleBtn;
+
+        public bool showBuildHotPathBtn;
+
+        //热更补丁版本
+        public int hotPatchVersion;
+
+        //app版本号
+        public string appVersion;
+
+        //更新信息
+        public string notice;
         
+        
+        /// <summary>
+        /// 打包AB包
+        /// </summary>
+        public void AssetBundleBuild()
+        {
+            for (int i = 0; i < BuildBundleConfigura.Instance.AssetBundleConfig.Count; i++)
+            {
+                if (BuildBundleConfigura.Instance.AssetBundleConfig[i].isBuild)
+                {
+                    BuildBundleCompiler.BuildAssetBundle(BuildBundleConfigura.Instance.AssetBundleConfig[i], BuildType.AssetBundle);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 内嵌资源
+        /// </summary>
+        public void EnbeddedAssetBundle()
+        {
+            //TODO..
+        }
+
+        /// <summary>
+        /// 构建热更补丁
+        /// </summary>
+        public void BuildHotPatch()
+        {
+            for (int i = 0; i < BuildBundleConfigura.Instance.AssetBundleConfig.Count; i++)
+            {
+                var data = BuildBundleConfigura.Instance.AssetBundleConfig[i];
+                if (BuildBundleConfigura.Instance.AssetBundleConfig[i].isBuild)
+                {
+                    BuildBundleCompiler.BuildAssetBundle(data, BuildType.HotPatch,hotPatchVersion,appVersion,notice);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 上传热更文件至服务器
+        /// </summary>
+        public void UpdateHotPatchToServe()
+        {
+            //TODO..
+        }
 #endif
     }
 }

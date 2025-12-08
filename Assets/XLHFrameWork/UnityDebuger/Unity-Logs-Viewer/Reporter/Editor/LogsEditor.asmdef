@@ -1,0 +1,18 @@
+{
+    "name": "LogsEditor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:bb4fd80c427a84c408953689ac2b5aa0"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

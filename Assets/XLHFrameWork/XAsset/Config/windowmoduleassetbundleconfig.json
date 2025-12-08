@@ -1,0 +1,40 @@
+{
+  "bundleInfoList": [
+    {
+      "path": "Assets/XLHFrameWork/UIFrameWork/UIFrameWorkConfig/UIBasePrefabs/EventSystem.prefab",
+      "crc": 3356117567,
+      "bundleName": "windowmodule_uibaseprefabs.cc",
+      "assetName": "EventSystem.prefab",
+      "bundleModule": "WindowModule",
+      "isAddressableAsset": false,
+      "bundleDependce": []
+    },
+    {
+      "path": "Assets/XLHFrameWork/UIFrameWork/UIFrameWorkConfig/UIBasePrefabs/UICamera.prefab",
+      "crc": 3121522532,
+      "bundleName": "windowmodule_uibaseprefabs.cc",
+      "assetName": "UICamera.prefab",
+      "bundleModule": "WindowModule",
+      "isAddressableAsset": false,
+      "bundleDependce": []
+    },
+    {
+      "path": "Assets/XLHFrameWork/UIFrameWork/UIFrameWorkConfig/UIPathConfig/UWindowPath.asset",
+      "crc": 764649826,
+      "bundleName": "windowmodule_uipathconfig.cc",
+      "assetName": "UWindowPath.asset",
+      "bundleModule": "WindowModule",
+      "isAddressableAsset": false,
+      "bundleDependce": []
+    },
+    {
+      "path": "Assets/XLHFrameWork/XAsset/Config/windowmoduleassetbundleconfig.json",
+      "crc": 1310613216,
+      "bundleName": "windowmodulebundleconfig.cc",
+      "assetName": "windowmoduleassetbundleconfig.json",
+      "bundleModule": "WindowModule",
+      "isAddressableAsset": false,
+      "bundleDependce": []
+    }
+  ]
+}

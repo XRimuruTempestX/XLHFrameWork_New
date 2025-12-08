@@ -16,7 +16,7 @@ MonoBehaviour:
   - bundleid: 0
     moduleName: cc
     isAddressableAsset: 0
-    isBuild: 0
+    isBuild: 1
     isAddModule: 0
     lastClickBtnTime: 0
     prefabPathArr:
@@ -34,3 +34,8 @@ MonoBehaviour:
     rootFolderPathArr: []
     singleFolderPathArr:
     - Assets/XLHFrameWork/UIFrameWork/UIFrameWorkConfig
+  showAssetBundleBtn: 1
+  showBuildHotPathBtn: 1
+  hotPatchVersion: 0
+  appVersion: 0.1.0
+  notice: 1

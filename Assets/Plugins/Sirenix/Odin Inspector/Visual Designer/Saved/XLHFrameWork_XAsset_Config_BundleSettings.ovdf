@@ -1,0 +1,49 @@
+OVDF v1.0
+XLHFrameWork.XAsset.Config.BundleSettings, XAsset
+
+# buildTarget
++ [Sirenix.OdinInspector.LabelTextAttribute]
+	Text = "打包平台"
++ [Sirenix.OdinInspector.PropertyTooltipAttribute]
+	Tooltip = "暂时是当前编辑器平台"
+
+# AssetBundleDownLoadUrl
+Position: $root:1
++ [Sirenix.OdinInspector.LabelTextAttribute]
+	Text = "AssetBundle下载Url"
+	NicifyText = True
+	IconColor = ""
+	Icon = None
+
+# ABSUFFIX
+Position: $root:5
++ [Sirenix.OdinInspector.LabelTextAttribute]
+	Text = "文件后缀"
+
+# buildbundleOptions
++ [Sirenix.OdinInspector.EnumPagingAttribute]
++ [Sirenix.OdinInspector.LabelTextAttribute]
+	Text = "压缩方式"
++ [Sirenix.OdinInspector.PropertyTooltipAttribute]
+	Tooltip = "暂时无用"
+
+# bundleHotType
++ [Sirenix.OdinInspector.LabelTextAttribute]
+	Text = "是否热更"
+	Icon = CloudDownloadFill
+	IconColor = "red"
+
+# loadAssetType
++ [Sirenix.OdinInspector.LabelTextAttribute]
+	Text = "资源加载方式"
+
+# MAX_THREAD_COUNT
++ [Sirenix.OdinInspector.LabelTextAttribute]
+	Text = "最大下载线程数量"
+
+# XAssetRootPath
++ [Sirenix.OdinInspector.LabelTextAttribute]
+	Text = "框架更目录"
+
+# bundleEncrypt
+Position: $root:2

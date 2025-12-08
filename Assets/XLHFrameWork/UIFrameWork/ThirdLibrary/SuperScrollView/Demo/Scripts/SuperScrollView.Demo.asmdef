@@ -1,0 +1,16 @@
+{
+    "name": "SuperScrollView.Demo",
+    "rootNamespace": "",
+    "references": [
+        "GUID:c7661d7816a2e1943987569b8feedffd"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

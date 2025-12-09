@@ -144,7 +144,13 @@ namespace XLHFrameWork.XAsset.Editor.BundleBuild
         /// </summary>
         public void EnbeddedAssetBundle()
         {
-            //TODO..
+            for (int i = 0; i < BuildBundleConfigura.Instance.AssetBundleConfig.Count; i++)
+            {
+                if (BuildBundleConfigura.Instance.AssetBundleConfig[i].isBuild)
+                {
+                    BuildBundleCompiler.CopyBundleToStramingAssets(BuildBundleConfigura.Instance.AssetBundleConfig[i]);
+                }
+            }
         }
 
         /// <summary>

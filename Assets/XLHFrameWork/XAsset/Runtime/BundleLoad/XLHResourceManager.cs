@@ -214,52 +214,44 @@ namespace XLHFrameWork.XAsset.Runtime.BundleLoad
             Log("LoadResourceAsync start path=" + path + ", crc=" + crc + ", type=" + typeof(T).Name);
 
             BundleItem item = AssetBundleManager.Instance.GetBundleItemByCrc(crc);
-            if (item != null)
+            if (item.obj != null)
             {
-                if (item.obj != null)
-                {
-                    Log("BundleItem already has obj, returning cached for path=" + path);
-                    return (T)item.obj;
-                }
+                Log("BundleItem already has obj, returning cached for path=" + path);
+                return (T)item.obj;
+            }
 
-                T obj = null;
+            T obj = null;
 
 #if UNITY_EDITOR
-                if (BundleSettings.Instance.loadAssetType == LoadAssetEnum.Editor)
-                {
-                    obj = LoadAssetsFromEditor<T>(path);
-                    if (obj == null)
-                    {
-                        LogError("Load object is null path=" + path);
-                        return null;
-                    }
-
-                    item.obj = obj;
-                    Log("Editor mode load success path=" + path);
-                    return obj;
-                }
-#endif
-                item = await AssetBundleManager.Instance.LoadAssetBundle(crc);
-                if (item.obj != null)
-                {
-                    Log("Item.obj present after bundle load path=" + path);
-                    return item.obj as T;
-                }
-
-                var sw = new System.Diagnostics.Stopwatch();
-                sw.Start();
-                T loadObj = await item.assetBundle.LoadAssetAsync<T>(item.path) as T;
-                sw.Stop();
-                Log("AssetBundle LoadAssetAsync done assetPath=" + item.path + ", elapsed=" + sw.ElapsedMilliseconds +
-                    " ms");
-                return loadObj;
-            }
-            else
+            if (BundleSettings.Instance.loadAssetType == LoadAssetEnum.Editor)
             {
-                LogError("item is null path=" + path);
-                LogError("item is null crc=" + crc.ToString());
-                return null;
+                obj = LoadAssetsFromEditor<T>(path);
+                if (obj == null)
+                {
+                    LogError("Load object is null path=" + path);
+                    return null;
+                }
+
+                // item.obj = obj;
+                Log("Editor mode load success path=" + path);
+                return obj;
             }
+#endif
+            item = await AssetBundleManager.Instance.LoadAssetBundle(crc);
+            if (item.obj != null)
+            {
+                Log("Item.obj present after bundle load path=" + path);
+                return item.obj as T;
+            }
+
+            var sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+            T loadObj = await item.assetBundle.LoadAssetAsync<T>(item.path) as T;
+            item.obj = loadObj;
+            sw.Stop();
+            Log("AssetBundle LoadAssetAsync done assetPath=" + item.path + ", elapsed=" + sw.ElapsedMilliseconds +
+                " ms");
+            return loadObj;
         }
 
 

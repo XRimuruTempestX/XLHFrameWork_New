@@ -41,6 +41,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogsEditor", "LogsEditor.cs
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{991d4d90-7d85-4d12-bef8-2131a655fe9d}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Timer.Runtime", "Timer.Runtime.csproj", "{29d580de-99fa-0faa-9e77-4697ea88af4e}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniTask.Addressables", "UniTask.Addressables.csproj", "{b957f7d8-d13f-1fbe-38b2-e44c85ad2624}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniTask.DOTween", "UniTask.DOTween.csproj", "{0e3d5e15-274a-2e30-d2ef-c31cd5e93441}"
@@ -90,6 +92,8 @@ Global
 		{ce032e0e-2884-60bc-2acc-31a4c5877612}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{991d4d90-7d85-4d12-bef8-2131a655fe9d}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{991d4d90-7d85-4d12-bef8-2131a655fe9d}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29d580de-99fa-0faa-9e77-4697ea88af4e}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29d580de-99fa-0faa-9e77-4697ea88af4e}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{b957f7d8-d13f-1fbe-38b2-e44c85ad2624}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{b957f7d8-d13f-1fbe-38b2-e44c85ad2624}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0e3d5e15-274a-2e30-d2ef-c31cd5e93441}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
